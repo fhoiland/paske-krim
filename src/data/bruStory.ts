@@ -222,67 +222,67 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "tove",
       name: "Tove",
       role: "den metodiske løypeføreren",
-      style: "noterer alt i små blokker og virker mistenkelig komfortabel med tidslinjer, håndklær og andres pinlige afterski-valg",
+      style: "noterer alt i små blokker og ser ut som hun kunne ledet både en redningsaksjon og et meget dømmende nachspiel i samme morgenkåpe",
       clueItem: "røde skivoksspor",
       clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
       alibi: "hevdet at hun bare målte snødybde ved brua og absolutt ikke hadde noe med den halvåpne badstuedøra å gjøre",
       contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
-      interviewTell: "siterer klokkeslett litt for presist uten å ha blitt spurt"
+      interviewTell: "siterer klokkeslett med samme energi som folk flest bruker når de lyver om hvor klærne deres ble av"
     },
     {
       id: "siw",
       name: "Siw",
       role: "den elegante premiebordansvarlige",
-      style: "retter på duker med ro og ser fornærmet ut hvis noen puster nær serviettene, champagneglassene eller silkekåpen hennes",
+      style: "retter på duker med iskald ro og ser ut som hun kunne avslutte både en diskusjon og en flørt med ett eneste hevet øyenbryn",
       clueItem: "glitterstøv",
       clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
       alibi: "sa at hun var i gangen og beroliget haren hele tiden, og definitivt ikke drev med dramatisk garderobekrise",
       contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
-      interviewTell: "sukker før hvert svar som om avhøret er under hennes nivå"
+      interviewTell: "sukker før hvert svar som om hele avhøret forstyrrer en mye viktigere garderobekrise"
     },
     {
       id: "therese",
       name: "Therese",
       role: "den teatralske dekorbyggeren",
-      style: "snakker i store bilder og mener belysning, stemning og riktig mengde strategisk naken skulder er viktigere enn sannhet",
+      style: "snakker i store bilder og oppfører seg som om livet er et sceneshow der spotlys, champagne og strategisk bare skuldre er en menneskerett",
       clueItem: "fiolett tape",
       clueDetail: "en tynn stripe fiolett tape bak duken",
       alibi: "påsto at hun testet lysslyngene ute på verandaen og bare tilfeldigvis manglet den ene paljettjakken sin",
       contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
-      interviewTell: "svarer med tre detaljer når ett ord hadde holdt"
+      interviewTell: "svarer med tre detaljer, to sidespor og én unødvendig sensuell forklaring når ett ord hadde holdt"
     },
     {
       id: "inge",
       name: "Inge",
       role: "den stille logistikksjefen",
-      style: "bærer ting uten å lage lyd og liker at alle tror han bare ordner praktiske småting, morgenkåper og diskret rot",
+      style: "bærer ting uten å lage lyd og har den typen ro som bare finnes hos menn som allerede har ryddet bort både glass, håndklær og bevis før frokost",
       clueItem: "grå sekketråd",
       clueDetail: "en grå fibertråd som sitter fast i dukekanten",
       alibi: "sa at han sto ved vedkassen og ryddet tauverk mens andre løp rundt i altfor lite planlagt påskebekledning",
       contradiction: "hevder han bare håndterte tau ute, men en lik fibertråd sitter i silkeduken inne",
-      interviewTell: "nikker før han svarer, som om han først godkjenner sin egen løgn"
+      interviewTell: "nikker før han svarer, som om han først må sjekke om løgnen fortsatt ser presentabel ut i dagslys"
     },
     {
       id: "jan",
       name: "Jan",
       role: "den joviale grillmesteren uten grill",
-      style: "ler høyt, tar plass og tror at godt humør, bar overkropp og et håndkle over skulderen teller som alibi",
+      style: "ler høyt, tar plass og har den sjeldne evnen til å få bar overkropp, dårlig timing og enorm selvtillit til å høres ut som et forsvar",
       clueItem: "røykstøv",
       clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
       alibi: "insisterte på at han bare sto på tunet og fortalte lange historier, til tross for at halve hytta husker et meget unødvendig badstue-innslag",
       contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
-      interviewTell: "skifter tema til pølser når spørsmålene blir konkrete"
+      interviewTell: "skifter tema til pølser, puls eller badstue så snart noen nærmer seg sannheten"
     },
     {
       id: "fredrik",
       name: "Fredrik",
       role: "den tekniske dørvokteren",
-      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, spesielt hvorfor buksa hans plutselig lå i feil etasje",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvorfor buksa hans tilsynelatende tok en egen liten rundtur i hytta",
       clueItem: "kobberstøv",
       clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
       alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget, selv om flere vitner nevner en pinlig sprint etter et bortkommet håndkle",
       contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
-      interviewTell: "bruker ordet 'teknisk sett' når sannheten begynner å vingle"
+      interviewTell: "bruker uttrykket 'teknisk sett' med den desperate tryggheten til en mann som håper semantikk skal redde både ære og håndkle"
     }
   ],
   kodeknekker: [
@@ -290,67 +290,67 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "tove",
       name: "Tove",
       role: "den metodiske løypeføreren",
-      style: "noterer alt i små blokker og virker mistenkelig komfortabel med tidslinjer",
+      style: "noterer alt i små blokker og har den kjølige roen til en person som allerede har sett alt, inkludert nok voksenhytteskam til å skrive bok om det",
       clueItem: "røde skivoksspor",
       clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
       alibi: "hevdet at hun bare målte snødybde ved brua og aldri gikk inn",
       contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
-      interviewTell: "siterer klokkeslett litt for presist uten å ha blitt spurt"
+      interviewTell: "siterer klokkeslett som om hun prøver å vinne NM i passiv-aggressiv etterpåklokskap"
     },
     {
       id: "siw",
       name: "Siw",
       role: "den elegante premiebordansvarlige",
-      style: "retter på duker med ro og ser fornærmet ut hvis noen puster nær serviettene",
+      style: "retter på duker med kongelig forakt og får hele rommet til å føle seg underkledd, undertent og litt skyldig",
       clueItem: "glitterstøv",
       clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
       alibi: "sa at hun var i gangen og beroliget haren hele tiden",
       contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
-      interviewTell: "sukker før hvert svar som om avhøret er under hennes nivå"
+      interviewTell: "sukker før hvert svar som om hele rommet burde skamme seg for å ha avbrutt hennes dramatiske entré"
     },
     {
       id: "therese",
       name: "Therese",
       role: "den teatralske dekorbyggeren",
-      style: "snakker i store bilder og mener belysning er viktigere enn sannhet",
+      style: "snakker i store bilder og bærer seg som om enhver samtale bør ha myk belysning, applaus og minst én uplanlagt avkledning",
       clueItem: "fiolett tape",
       clueDetail: "en tynn stripe fiolett tape bak duken",
       alibi: "påsto at hun testet lysslyngene ute på verandaen",
       contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
-      interviewTell: "svarer med tre detaljer når ett ord hadde holdt"
+      interviewTell: "leverer hvert svar som en liten erotisk thriller ingen egentlig ba om"
     },
     {
       id: "inge",
       name: "Inge",
       role: "den stille logistikksjefen",
-      style: "bærer ting uten å lage lyd og liker at alle tror han bare ordner praktiske småting",
+      style: "bærer ting uten å lage lyd og ser ut som han kunne ryddet bort både bevis, sexleketøy og dårlig dømmekraft før noen andre fant tøflene sine",
       clueItem: "grå sekketråd",
       clueDetail: "en grå fibertråd som sitter fast i dukekanten",
       alibi: "sa at han sto ved vedkassen og ryddet tauverk",
       contradiction: "hevder han bare håndterte tau ute, men en lik fibertråd sitter i silkeduken inne",
-      interviewTell: "nikker før han svarer, som om han først godkjenner sin egen løgn"
+      interviewTell: "nikker før han svarer, som om han først må gi løgnen sin grønt lys og korrekt håndklespenst"
     },
     {
       id: "jan",
       name: "Jan",
       role: "den joviale grillmesteren uten grill",
-      style: "ler høyt, tar plass og tror at godt humør teller som alibi",
+      style: "ler høyt, tar plass og oppfører seg som om sjarm, damp og delvis påkledning er juridisk bindende dokumentasjon",
       clueItem: "røykstøv",
       clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
       alibi: "insisterte på at han bare sto på tunet og fortalte lange historier",
       contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
-      interviewTell: "skifter tema til pølser når spørsmålene blir konkrete"
+      interviewTell: "skifter tema til pølser, pupper, puls eller badstue i ren overlevelsespanel"
     },
     {
       id: "fredrik",
       name: "Fredrik",
       role: "den tekniske dørvokteren",
-      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvordan én nøkkel, ett håndkle og null selvinnsikt kan ødelegge en hel påskeaften",
       clueItem: "kobberstøv",
       clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
       alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget",
       contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
-      interviewTell: "bruker ordet 'teknisk sett' når sannheten begynner å vingle"
+      interviewTell: "bruker ordet 'teknisk sett' så ofte at hele hytta lukter ansvarsfraskrivelse og varm furupanel"
     }
   ]
 };
