@@ -27,27 +27,27 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <Fragment slot="lead">
       <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         {agencyNames[0]}, {agencyNames[1]} og hele {agencyNames[2]} trenger hjelp. Velg vanskelighetsgrad,
-        start en ny sak, og trykk dere videre side for side gjennom avledning, spor, kode og finale.
+        les briefen, møt de mistenkte og gå videre til saken når du er klar.
       </p>
     </Fragment>
 
-    <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+    <section class="grid gap-6">
       <article class="panel-card">
-        <span class="section-pill">Historien begynner</span>
+        <span class="section-pill">Forhistorien</span>
         <div class="mt-5 space-y-4 leading-8 text-stone-700">
           {introText.map((paragraph) => <p>{paragraph}</p>)}
         </div>
 
-        <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div class="dossier-card">
             <p class="dossier-label">Format</p>
-            <p class="mt-2 font-semibold text-stone-900">Forside + {totalTasks} oppgavesider + finale</p>
+            <p class="mt-2 font-semibold text-stone-900">Forside + briefing + {totalTasks} oppgaver + finale</p>
           </div>
           <div class="dossier-card">
             <p class="dossier-label">Sakstjeneste</p>
             <p class="mt-2 font-semibold text-stone-900">{agencyNames[3]} står klar med kakao og mistanke.</p>
           </div>
-          <div class="dossier-card sm:col-span-2">
+          <div class="dossier-card sm:col-span-2 lg:col-span-1">
             <p class="dossier-label">Beste tid på valgt nivå</p>
             <p class="mt-2 font-serif text-3xl text-stone-900" id="best-time-label">Ingen løst ennå</p>
           </div>
@@ -81,7 +81,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             type="button"
             class="submit-btn inline-flex items-center justify-center"
           >
-            Start ny Bru-sak
+            Gå til briefing
           </button>
           <button
             id="continue-story"
@@ -90,32 +90,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           >
             Fortsett saken
           </button>
-        </div>
-      </article>
-
-      <article class="panel-card">
-        <span class="section-pill">Saksarkiv</span>
-        <div class="mt-5 grid gap-4">
-          <div class="dossier-card">
-            <p class="dossier-label">Mistenkte i omløp</p>
-            <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700" id="roster-preview"></ul>
-          </div>
-
-          <div class="dossier-card">
-            <p class="dossier-label">Hva varierer i hver runde?</p>
-            <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
-              <li id="roster-count">Ulike antall mistenkte, avhengig av vanskelighetsgrad.</li>
-              <li>{motives.length} motiver, fra sabotasje til ren oppmerksomhetsnød.</li>
-              <li>{hidingSpots.length} skjulesteder med svært tvilsom påskelogistikk.</li>
-            </ul>
-          </div>
-
-          <div class="rounded-[1.6rem] bg-[linear-gradient(135deg,#fff0a6,#ffd867)] p-5 text-stone-900 shadow-inner">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-900">Bru-brief</p>
-            <p class="mt-2 font-serif text-3xl leading-tight">
-              {agencyNames[4]} melder at saken blir villere, morsommere og lurere jo høyere nivå du velger.
-            </p>
-          </div>
         </div>
       </article>
     </section>
@@ -141,8 +115,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const continueButton = document.getElementById("continue-story");
       const difficultyLabel = document.getElementById("difficulty-current-label");
       const bestTimeLabel = document.getElementById("best-time-label");
-      const rosterPreview = document.getElementById("roster-preview");
-      const rosterCount = document.getElementById("roster-count");
       const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
       const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
       const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
@@ -171,13 +143,8 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         const active = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
         const stats = runtime.readStats(statsKey);
         const best = stats.bestTimes?.[active.id];
-        const roster = suspectRosters[active.id] || [];
         difficultyLabel.textContent = `${active.title} valgt`;
         bestTimeLabel.textContent = best ? runtime.formatDuration(best) : "Ingen løst ennå";
-        rosterPreview.innerHTML = roster
-          .map((suspect) => `<li><strong>${suspect.name}</strong>: ${suspect.role}</li>`)
-          .join("");
-        rosterCount.textContent = `${roster.length} mistenkte på dette nivået, og minst én oppfører seg dramatisk uten grunn.`;
         difficultyButtons.forEach((button) => {
           const isActive = button.dataset.difficulty === selectedDifficulty;
           button.classList.toggle("selected-difficulty", isActive);
@@ -193,9 +160,9 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       });
 
       startButton?.addEventListener("click", () => {
+        runtime.resetAll({ caseKey, progressKey, settingsKey });
         runtime.writeSettings(settingsKey, { difficultyId: selectedDifficulty });
-        runtime.resetCase(caseDataFor(selectedDifficulty));
-        window.location.href = `${basePath}oppgave/1`;
+        window.location.href = `${basePath}briefing`;
       });
 
       const progress = runtime.readProgress(progressKey);

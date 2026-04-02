@@ -1,0 +1,134 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import StoryShell from "../components/StoryShell.astro";
+import {
+  agencyNames,
+  caseKey,
+  caseVersion,
+  difficulties,
+  hidingSpots,
+  motives,
+  progressKey,
+  settingsKey,
+  storyTitle,
+  suspectRosters,
+  totalTasks
+} from "../data/bruStory";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<MainLayout title={`Briefing | ${storyTitle}`}>
+  <StoryShell title="Briefing før saken" eyebrow="Saksbrief" kicker="Møt de mistenkte">
+    <Fragment slot="lead">
+      <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
+        Før dere går løs på oppgave 1, får dere en kort briefing med nivå, mistenkte og det viktigste
+        dere bør ha i bakhodet når kaoset på Bru starter.
+      </p>
+    </Fragment>
+
+    <section class="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+      <article class="panel-card">
+        <span class="section-pill">Saksoppsett</span>
+        <div class="mt-5 grid gap-4">
+          <div class="dossier-card">
+            <p class="dossier-label">Valgt nivå</p>
+            <p id="briefing-difficulty" class="mt-2 font-serif text-3xl text-stone-900">Laster nivå ...</p>
+            <p id="briefing-humor" class="mt-2 text-sm font-semibold text-orange-900"></p>
+          </div>
+          <div class="dossier-card">
+            <p class="dossier-label">Saksflyt</p>
+            <p class="mt-2 text-sm leading-7 text-stone-700">
+              Først får dere oversikten, så går dere videre gjennom {totalTasks} oppgaver og til slutt en finale.
+            </p>
+          </div>
+          <div class="dossier-card">
+            <p class="dossier-label">Tips fra enheten</p>
+            <p id="briefing-agency" class="mt-2 text-sm leading-7 text-stone-700"></p>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="start-first-task" type="button" class="submit-btn">Start oppgave 1</button>
+          <a
+            href={basePath}
+            class="inline-flex w-full items-center justify-center rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 sm:w-auto"
+          >
+            Bytt nivå
+          </a>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <span class="section-pill">Personoversikt</span>
+        <div id="briefing-roster" class="mt-5 grid gap-4"></div>
+      </article>
+    </section>
+
+    <script
+      is:inline
+      define:vars={{
+        agencyNames,
+        basePath,
+        caseKey,
+        caseVersion,
+        difficulties,
+        hidingSpots,
+        motives,
+        progressKey,
+        settingsKey,
+        suspectRosters
+      }}
+    >
+      const runtime = window.BruCaseRuntime;
+      const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
+      const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
+      const selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+      const roster = suspectRosters[selectedDifficulty] || suspectRosters[defaultDifficulty.id];
+      const caseData = {
+        caseKey,
+        caseVersion,
+        difficulties,
+        hidingSpots,
+        motives,
+        progressKey,
+        selectedDifficulty,
+        suspects: roster
+      };
+
+      const progress = runtime.readProgress(progressKey);
+      const existingCase = localStorage.getItem(caseKey);
+      if (!existingCase || !progress.started) {
+        runtime.resetCase(caseData);
+      } else {
+        runtime.ensureCase(caseData);
+      }
+
+      const difficulty = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
+      document.getElementById("briefing-difficulty").textContent = difficulty.title;
+      document.getElementById("briefing-humor").textContent = difficulty.humor;
+      document.getElementById("briefing-agency").textContent =
+        `${agencyNames[difficulty.level % agencyNames.length]} anbefaler at dere leser både stil, alibi og små rare glipper før dere går videre.`;
+
+      document.getElementById("briefing-roster").innerHTML = roster
+        .map(
+          (suspect) => `
+            <article class="dossier-card">
+              <p class="font-serif text-2xl text-stone-900">${suspect.name}</p>
+              <p class="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${suspect.role}</p>
+              <p class="mt-3 text-sm leading-6 text-stone-700">${suspect.style}</p>
+              <p class="mt-3 text-sm leading-6 text-stone-700"><strong>Alibi:</strong> ${suspect.alibi}</p>
+              <p class="mt-2 text-sm leading-6 text-stone-600"><strong>Typisk glipp:</strong> ${suspect.interviewTell}</p>
+            </article>
+          `
+        )
+        .join("");
+
+      document.getElementById("start-first-task")?.addEventListener("click", () => {
+        window.location.href = `${basePath}oppgave/1`;
+      });
+    </script>
+  </StoryShell>
+</MainLayout>
