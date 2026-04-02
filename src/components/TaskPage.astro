@@ -32,6 +32,11 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
   </Fragment>
 
+  <section class="panel-card">
+    <span class="section-pill">Mistenkte på dette nivået</span>
+    <div id={`suspects-task-${task.id}`} class="mt-5 grid gap-4 lg:grid-cols-2"></div>
+  </section>
+
   <InvestigationMap basePath={basePath} currentTaskId={task.id} />
 
   <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
@@ -72,11 +77,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
         <div id={`success-links-task-${task.id}`} class="mt-4 flex flex-wrap gap-3"></div>
       </div>
     </article>
-  </section>
-
-  <section class="panel-card">
-    <span class="section-pill">Mistenkte på dette nivået</span>
-    <div id={`suspects-task-${task.id}`} class="mt-5 grid gap-4 lg:grid-cols-2"></div>
   </section>
 
   <script
