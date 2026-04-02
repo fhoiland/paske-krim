@@ -10,6 +10,7 @@ import {
   motives,
   progressKey,
   settingsKey,
+  statsKey,
   suspects,
   totalTasks
 } from "../data/bruStory";
@@ -68,6 +69,13 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           <div class="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
+              id="share-report"
+              class="inline-flex rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+            >
+              Kopier rapport
+            </button>
+            <button
+              type="button"
               id="restart-case"
               class="inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
             >
@@ -100,6 +108,11 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             <p class="dossier-label">Aktiv vanskelighetsgrad</p>
             <p id="final-difficulty-copy" class="mt-2 font-semibold text-stone-900">Laster nivå ...</p>
           </div>
+          <div class="dossier-card">
+            <p class="dossier-label">Sakstid</p>
+            <p id="final-time-copy" class="mt-2 font-semibold text-stone-900">Laster tid ...</p>
+            <p id="final-best-copy" class="mt-2 text-sm font-semibold text-orange-900">Laster rekord ...</p>
+          </div>
         </div>
       </article>
     </section>
@@ -116,6 +129,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         motives,
         progressKey,
         settingsKey,
+        statsKey,
         suspects,
         totalTasks
       }}
@@ -151,11 +165,30 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const revealCopy = document.getElementById("final-reveal-copy");
       const agencyCopy = document.getElementById("final-agency-copy");
       const difficultyCopy = document.getElementById("final-difficulty-copy");
+      const timeCopy = document.getElementById("final-time-copy");
+      const bestCopy = document.getElementById("final-best-copy");
+      const shareButton = document.getElementById("share-report");
       const state = { culprit: "", motive: "", hiding: "" };
+      let solvedSummary = "";
+      let solvedOnce = false;
 
       agencyCopy.textContent =
         `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} er klare til å arkivere saken, men bare hvis rapporten deres ikke lukter ren gjetting.`;
       difficultyCopy.textContent = `${difficulty.title} | ${difficulty.humor}`;
+      timeCopy.textContent = runtime.formatDuration(runtime.elapsedMs(caseFile));
+      const currentBest = runtime.readStats(statsKey).bestTimes?.[difficulty.id];
+      bestCopy.textContent = currentBest
+        ? `Beste tid på dette nivået: ${runtime.formatDuration(currentBest)}`
+        : "Ingen registrert rekord på dette nivået ennå.";
+
+      function rankLabel(ms, level) {
+        const seconds = Math.floor(ms / 1000);
+        if (level === 1) return "Miniagent med gulrotsertifikat";
+        if (seconds < 90) return "Bru-legende";
+        if (seconds < 150) return "Kripos avdeling Bru";
+        if (seconds < 240) return "Skarp sporhund";
+        return "Seig, men stødig kodeknekker";
+      }
 
       document.querySelectorAll("[data-group]").forEach((group) => {
         group.querySelectorAll("[data-option]").forEach((button) => {
@@ -175,14 +208,40 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         }
 
         if (state.culprit === culprit.id && state.motive === motive.id && state.hiding === hidingSpot.id) {
+          const elapsed = runtime.elapsedMs(caseFile);
+          const result = runtime.recordBestTime(statsKey, difficulty.id, elapsed);
+          const rank = rankLabel(elapsed, difficulty.level);
+          solvedSummary =
+            `Sak Bru-${caseFile.caseNumber} løst på ${runtime.formatDuration(elapsed)}. Rang: ${rank}. ` +
+            `Tyv: ${culprit.name}. Motiv: ${motive.label}. Gjemmested: ${hidingSpot.label}.`;
+          solvedOnce = true;
+          timeCopy.textContent = runtime.formatDuration(elapsed);
           feedback.textContent = "Saken er løst.";
           feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
           revealCopy.textContent =
-            `${culprit.name} sto bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble funnet ${hidingSpot.label}. ${agencyNames[0]} kaller dette en forbilledlig seier for norsk hytteetterforskning.`;
+            `${culprit.name} sto bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble funnet ${hidingSpot.label}. Rang oppnådd: ${rank}. ${result.isRecord ? "Ny rekord på dette nivået." : `Beste tid står fortsatt på ${runtime.formatDuration(result.best)}.`} ${agencyNames[0]} kaller dette en forbilledlig seier for norsk hytteetterforskning.`;
+          bestCopy.textContent = `Beste tid på dette nivået: ${runtime.formatDuration(result.best)}`;
           revealBox.classList.remove("hidden");
         } else {
           feedback.textContent = "Nesten. Les gjennom sporene igjen og prøv en ny kombinasjon.";
           feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+        }
+      });
+
+      shareButton?.addEventListener("click", async () => {
+        if (!solvedOnce || !solvedSummary) {
+          feedback.textContent = "Løs saken først før du kopierer rapporten.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(solvedSummary);
+          feedback.textContent = "Rapport kopiert til utklippstavlen.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
+        } catch {
+          feedback.textContent = solvedSummary;
+          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
         }
       });
 

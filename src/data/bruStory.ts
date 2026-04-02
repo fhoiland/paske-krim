@@ -48,6 +48,7 @@ export const storyTitle = "Påskekrimmen på Bru";
 export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
+export const statsKey = "bru-hytte-paskekrim-stats";
 export const caseVersion = 3;
 
 export const agencyNames = [

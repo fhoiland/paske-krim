@@ -9,6 +9,7 @@ import {
   motives,
   progressKey,
   settingsKey,
+  statsKey,
   suspects,
   type TaskMeta,
   totalTasks
@@ -44,6 +45,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           <p class="dossier-label">Aktiv enhet</p>
           <p id={`agency-task-${task.id}`} class="mt-2 font-serif text-2xl text-stone-900">Laster enhet ...</p>
           <p id={`difficulty-task-${task.id}`} class="mt-2 text-sm font-semibold text-orange-900"></p>
+          <p id={`timer-task-${task.id}`} class="mt-3 text-lg font-bold text-stone-900">Tid i saken: 00:00</p>
         </div>
       </div>
     </article>
@@ -100,6 +102,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       previousHref,
       progressKey,
       settingsKey,
+      statsKey,
       suspects,
       taskId: task.id
     }}
@@ -143,6 +146,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const caseNumberEl = document.getElementById(`case-number-${taskId}`);
     const agencyEl = document.getElementById(`agency-task-${taskId}`);
     const difficultyEl = document.getElementById(`difficulty-task-${taskId}`);
+    const timerEl = document.getElementById(`timer-task-${taskId}`);
     const submitEl = document.getElementById(`check-task-${taskId}`);
     let selected = "";
     let correctAnswer = "";
@@ -150,6 +154,10 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     caseNumberEl.textContent = `Bru-${caseFile.caseNumber}`;
     agencyEl.textContent = agencyNames[(caseFile.caseNumber + taskId) % agencyNames.length];
     difficultyEl.textContent = `${difficulty.title} | ${difficulty.humor}`;
+    timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
+    setInterval(() => {
+      timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
+    }, 1000);
 
     function addParagraphs(paragraphs) {
       storyEl.innerHTML = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
