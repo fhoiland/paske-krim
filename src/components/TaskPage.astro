@@ -50,11 +50,11 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     </article>
 
     <article class="panel-card">
-      <span class="section-pill">Velg riktig spor</span>
+      <span class="section-pill">Løs sporet</span>
       <p id={`prompt-task-${task.id}`} class="mt-5 text-base leading-7 text-stone-700"></p>
       <p id={`helper-task-${task.id}`} class="mt-3 text-sm font-semibold text-orange-900"></p>
       <div id={`meta-task-${task.id}`} class="mt-4 hidden rounded-[1.2rem] border border-stone-700/10 bg-white/70 p-4 text-sm leading-7 text-stone-700"></div>
-
+      <div id={`image-task-${task.id}`} class="mt-4 hidden overflow-hidden rounded-[1.2rem] border border-stone-700/10 bg-white/80"></div>
       <div id={`options-task-${task.id}`} class="mt-5 grid gap-3"></div>
 
       <button class="submit-btn mt-5" id={`check-task-${task.id}`} type="button">
@@ -83,6 +83,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     is:inline
     define:vars={{
       agencyNames,
+      basePath,
       caseKey,
       caseVersion,
       difficulties,
@@ -129,6 +130,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const promptEl = document.getElementById(`prompt-task-${taskId}`);
     const helperEl = document.getElementById(`helper-task-${taskId}`);
     const metaEl = document.getElementById(`meta-task-${taskId}`);
+    const imageEl = document.getElementById(`image-task-${taskId}`);
     const optionsEl = document.getElementById(`options-task-${taskId}`);
     const feedbackEl = document.getElementById(`feedback-task-${taskId}`);
     const successEl = document.getElementById(`success-task-${taskId}`);
@@ -141,6 +143,14 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const submitEl = document.getElementById(`check-task-${taskId}`);
     let selected = "";
     let correctAnswer = "";
+    let answerMode = "options";
+
+    const motiveKeywordMap = {
+      sabotage: "SABOTASJE",
+      swap: "BYTTE",
+      spotlight: "SPOTLIGHT",
+      ransom: "AVTALE"
+    };
 
     caseNumberEl.textContent = `Bru-${caseFile.caseNumber}`;
     agencyEl.textContent = agencyNames[(caseFile.caseNumber + taskId) % agencyNames.length];
@@ -157,11 +167,19 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
             <p class="font-serif text-2xl text-stone-900">${suspect.name}</p>
             <p class="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${suspect.role}</p>
             <p class="mt-3 text-sm leading-6 text-stone-700">${suspect.style}</p>
-            <p class="mt-3 text-sm leading-6 text-stone-600">Vanlig spor: <strong>${suspect.clueItem}</strong></p>
+            <p class="mt-3 text-sm leading-6 text-stone-700"><strong>Alibi:</strong> ${suspect.alibi}</p>
           </article>
         `
       )
       .join("");
+
+    function normalizeAnswer(value) {
+      return (value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/[.-]/g, "");
+    }
 
     function addParagraphs(paragraphs) {
       storyEl.innerHTML = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
@@ -178,7 +196,19 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       metaEl.innerHTML = copy;
     }
 
+    function addImageClue(title, caption) {
+      imageEl.classList.remove("hidden");
+      imageEl.innerHTML = `
+        <img src="${basePath}bru-paskekrim.png" alt="Bevisfoto fra saken på Bru" class="h-56 w-full object-cover object-center" />
+        <div class="p-4">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${title}</p>
+          <p class="mt-2 text-sm leading-6 text-stone-700">${caption}</p>
+        </div>
+      `;
+    }
+
     function addOptions(options) {
+      answerMode = "options";
       optionsEl.innerHTML = options
         .map(
           (option) =>
@@ -192,6 +222,26 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           optionsEl.querySelectorAll("[data-option]").forEach((item) => item.classList.remove("selected-option"));
           button.classList.add("selected-option");
         });
+      });
+    }
+
+    function addInput(label, placeholder = "", autocapitalize = "characters") {
+      answerMode = "input";
+      optionsEl.innerHTML = `
+        <label class="grid gap-2">
+          <span class="text-sm font-semibold uppercase tracking-[0.16em] text-orange-800">${label}</span>
+          <input
+            id="task-input"
+            type="text"
+            placeholder="${placeholder}"
+            autocapitalize="${autocapitalize}"
+            class="w-full rounded-[1rem] border border-stone-700/10 bg-white px-4 py-3 text-base text-stone-900 shadow-[0_8px_18px_rgba(59,33,20,0.06)] outline-none focus:border-orange-400"
+          />
+        </label>
+      `;
+      const input = document.getElementById("task-input");
+      input?.addEventListener("input", (event) => {
+        selected = normalizeAnswer(event.target.value);
       });
     }
 
@@ -210,39 +260,39 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     function helperText(taskNumber) {
       const helperMap = {
         1: {
-          max: "Bruagentene hvisker: Se etter hva som skjedde inne, ikke bare ute i snøen.",
-          high: "Tips: Høylytt kaos ute pleier å gi stille tid inne.",
-          medium: "Tenk på hva avledningen ga tyven tid til.",
-          low: "Bråk hjelper ofte noen andre.",
-          minimal: "Ingen kakao-hint på ekspertnivå."
+          max: "Bruagentene hvisker: Tenk på hva som ga tyven tid inne i hytta.",
+          high: "Se etter hva kaoset ute gjorde mulig inne.",
+          medium: "Det viktigste sporet er ikke den som ropte høyest.",
+          low: "Avledningen er ofte selve planen.",
+          minimal: "Ikke stirr på bildet. Les loggen."
         },
         2: {
-          max: `Se etter den som matcher sporet "${culprit.clueItem}".`,
+          max: `Finn personen som matcher sporet "${culprit.clueItem}".`,
           high: "Ett spor og ett alibi krasjer tydelig.",
           medium: "Sammenlikn detaljsporet med alibiene.",
           low: "Noen lyver elegant, men sporet lyver mindre.",
-          minimal: "Finn den minst sammenhengende forklaringen."
+          minimal: "Se etter den svakeste forklaringen."
         },
         3: {
-          max: `Koden ${caseFile.codedWord} peker mot skjulestedet.`,
-          high: "Kodeordet er vridd, men ikke langt fra svaret.",
+          max: `Koden ${caseFile.codedWord} må forskyves tilbake for å gi svaret.`,
+          high: "Kodeordet er vridd, men ikke langt fra sannheten.",
           medium: "Bruk både rutehint og kodehint.",
-          low: "Rute og kode må peke samme sted.",
-          minimal: "Dekod uten redningsvest."
+          low: "Dekod først, vurder sted etterpå.",
+          minimal: "Løs koden, ikke knappen."
         },
         4: {
-          max: "Se etter den som ikke kan få tidslinjen sin til å stemme.",
-          high: "Ett utsagn krasjer med både værme, spor og klokkeslett.",
-          medium: "Finn spriket i forklaringen, ikke bare sporet.",
-          low: "Nå teller sammenheng mer enn enkeltfunn.",
-          minimal: "Tidslinjen er dommeren."
+          max: "Finn personen som ikke kan være på to steder samtidig.",
+          high: "Tidslinjen er viktigere enn dramaet.",
+          medium: "Ett navn sprekker når klokkeslett legges oppå spor.",
+          low: "Nå teller sammenheng mer enn enkeltdetaljer.",
+          minimal: "Gi meg navnet, ikke gjetning."
         },
         5: {
-          max: `Brevet sier nesten rett ut: "${motive.clueText}"`,
-          high: "To små glipper peker mot samme motiv.",
-          medium: "Koble ordvalget i brevet med oppførselen i avhøret.",
-          low: "Nå må du lese mellom linjene.",
-          minimal: "Ingen hint. Kun kald logikk og påskenerver."
+          max: `Kodeordet peker mot motivet "${motiveKeywordMap[motive.id]}".`,
+          high: "Brevet og glippene peker mot samme motivkode.",
+          medium: "Koble nøkkelord til plan og avhør.",
+          low: "Motivet må passe hele stuntet.",
+          minimal: "Finn kodeordet som låser opp motivet."
         }
       };
 
@@ -273,34 +323,49 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     };
 
     if (taskId === 1) {
-      correctAnswer = "decoy";
       addParagraphs([
-        "Tunet er et fullstendig påskesirkus. Musen spretter gjennom snøen med pyntede småegg, haren roper som om verdens gulrotlager står i brann, og alle voksne spurter ut uten plan.",
-        "Inne i stua ligger den tomme sokkelen fortsatt varm. Smeltet snø drypper innenfor døra, og silkeduken har et ovalt merke der Bru-egget nettopp sto. Det er klassisk Bru-kaos: høylytt avledning ute, stille forbrytelse inne."
+        "Sambandsloggen viser at ropet ute kom akkurat idet glasslokket på premiestativet ble åpnet inne. Flere vitner husker bråk, løping og småegg i snøen, men ingen kan forklare hvorfor selve Bru-egget var ute av sikte allerede før alle kom tilbake.",
+        "Dette er ikke først og fremst et bildebevis, men et mønster i hendelser: høy lyd ute, kort tid alene inne og en perfekt sjanse for én person til å forsvinne to meter i stillhet."
       ]);
-      promptEl.textContent = "Hva er den beste forklaringen på hele opptrinnet?";
-      helperEl.textContent = helperText(1);
-      addOptions(
-        optionPool(
-          {
-            value: "decoy",
-            label: "Flukten ute var en avledning mens det ekte Bru-egget ble stjålet inne i hytta"
-          },
-          [
-            {
-              value: "outside",
-              label: "Musen løp direkte av gårde med selve Bru-egget, og alt skjedde ute på tunet"
-            },
-            {
-              value: "hare",
-              label: "Påskeharen ropte fordi han selv mistet kontroll på premien ved et uhell"
-            }
-          ],
-          genericDecoys.task1
-        )
+      addMeta(
+        `<p><strong>Sambandslogg:</strong> 18.07 rop ute. 18.08 døren slår opp. 18.09 glasslokket står allerede på gløtt.</p>`
       );
+      addImageClue(
+        "Bevisfoto",
+        "Bildet viser bare kaoset på tunet. På de høyeste nivåene er det sambandsloggen og rekkefølgen i hendelsene som er den egentlige nøkkelen."
+      );
+      helperEl.textContent = helperText(1);
+
+      if (difficulty.level === 5) {
+        correctAnswer = "AVLEDNING";
+        promptEl.textContent = "Skriv ett ord: Hva slags manøver var hele harekaoset egentlig?";
+        addInput("Svar med ett ord", "for eksempel: ...");
+      } else {
+        correctAnswer = "decoy";
+        promptEl.textContent = "Hva er den beste forklaringen på hele opptrinnet?";
+        addOptions(
+          optionPool(
+            {
+              value: "decoy",
+              label: "Flukten ute var en avledning mens det ekte Bru-egget ble stjålet inne i hytta"
+            },
+            [
+              {
+                value: "outside",
+                label: "Musen løp direkte av gårde med selve Bru-egget, og alt skjedde ute på tunet"
+              },
+              {
+                value: "hare",
+                label: "Påskeharen ropte fordi han selv mistet kontroll på premien ved et uhell"
+              }
+            ],
+            genericDecoys.task1
+          )
+        );
+      }
+
       successCopyEl.textContent =
-        "Riktig. Dere lot dere ikke lure av tun-teateret. Nå vet dere at noen brukte kaoset som dekke for den ekte forbrytelsen.";
+        "Riktig. Nå vet dere at noen brukte det ytre kaoset som dekke for selve hovedtyveriet.";
     }
 
     if (taskId === 2) {
@@ -309,7 +374,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
         `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på Bru finnes det få ting som er mer avslørende enn feil person med riktig detalj på feil sted.`,
         `Samtidig går dere gjennom alibiene: ${suspects
           .map((suspect) => `${suspect.name} ${suspect.alibi}`)
-          .join(". ")}. ${agencyNames[1]} mener at minst ett alibi ble sydd sammen i full fart mellom to slurker kakao.`
+          .join(". ")}. Ett navn passer betydelig dårligere enn de andre.`
       ]);
       promptEl.textContent = "Hvem peker spor og alibier tydeligst mot?";
       helperEl.textContent = helperText(2);
@@ -320,67 +385,72 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           genericDecoys.suspects
         )
       );
-      successCopyEl.textContent = `Sporene peker mot ${culprit.name}. Nå begynner rapporten å ligne noe ${agencyNames[2]} faktisk ville ha stemplet.`;
+      successCopyEl.textContent = `Sporene peker mot ${culprit.name}. Nå har dere et navn det faktisk går an å bygge en sak rundt.`;
     }
 
     if (taskId === 3) {
-      correctAnswer = hidingSpot.id;
       addParagraphs([
-        `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det tegnet en pil, to sure påskeegg og et ansikt som ser fornøyd ulovlig ut.`,
-        `Det andre sporet er mer konkret: ${hidingSpot.routeClue}. Når dere kobler den forskjøvne koden med ruten, peker alt mot ett sted.`
+        `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det risset inn en pil og en enkel skisse av ruten noen fulgte etter at alle stormet ut.`,
+        `Rutehintet sier: ${hidingSpot.routeClue}. Den som løser koden riktig, vet også hvilket skjulested som passer.`
       ]);
-      promptEl.textContent = "Hvor ble Bru-egget gjemt?";
       helperEl.textContent = helperText(3);
-      addOptions(
-        optionPool(
-          { value: hidingSpot.id, label: hidingSpot.label },
-          hidingSpots.map((spot) => ({ value: spot.id, label: spot.label })),
-          genericDecoys.hiding
-        )
-      );
-      successCopyEl.textContent = `${hidingSpot.revealText} Selv ${agencyNames[0]} nikker fornøyd og later som dette var planen hele tiden.`;
+
+      if (difficulty.level >= 4) {
+        correctAnswer = normalizeAnswer(hidingSpot.codeWord);
+        promptEl.textContent = "Dekod ordet og skriv stedkoden slik den egentlig skal være.";
+        addMeta(
+          `<p><strong>Kodehint:</strong> Bokstavene er forskjøvet én plass frem i alfabetet. Dere må gå én plass tilbake.</p>`
+        );
+        addInput("Skriv dekodet stedkode", "for eksempel: BRUA");
+      } else {
+        correctAnswer = hidingSpot.id;
+        promptEl.textContent = "Hvor ble Bru-egget gjemt?";
+        addOptions(
+          optionPool(
+            { value: hidingSpot.id, label: hidingSpot.label },
+            hidingSpots.map((spot) => ({ value: spot.id, label: spot.label })),
+            genericDecoys.hiding
+          )
+        );
+      }
+
+      successCopyEl.textContent = `${hidingSpot.revealText} Nå sitter dere med både rute og skjulested.`;
     }
 
     if (taskId === 4) {
-      correctAnswer = culprit.id;
       addParagraphs([
-        `På notatveggen har noen forsøkt å lage en tidslinje: kl. 18.07 startet harekaoset ute, kl. 18.09 ble lyset i stua kort dimmet, og kl. 18.11 ble silkeduken funnet forskjøvet.`,
-        `Samtidig sier ${culprit.name} følgende om egen kveld: ${culprit.contradiction}.`,
+        `På notatveggen står tidslinjen slik: 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.`,
+        `Én forklaring sprekker når dere legger den oppå klokkeslett, varme ved peisen og stedet sporet ble funnet. ${culprit.name} sier: ${culprit.contradiction}.`,
         difficulty.level >= 4
-          ? "For de høyere nivåene holder det ikke å finne et enkelt spor. Dere må se på rekkefølge, hva som kunne skjedd samtidig, og hvem som faktisk hadde nok tid til å utføre både avledningen og hovedtyveriet."
-          : "Ett av vitneutsagnene passer dårlig med både sporene og tidslinjen."
+          ? "Her holder det ikke å kjenne igjen et spor. Dere må se hvem som hevder å være ute, inne eller et helt annet sted på feil tidspunkt."
+          : "Ett navn passer dårlig med tidslinjen."
       ]);
       addMeta(
-        difficulty.level >= 4
-          ? `
-            <p><strong>Tidslinje:</strong> 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.</p>
-            <p><strong>Notat fra ${agencyNames[1]}:</strong> Den skyldige må ha vært nær både stua og premiebordet etter at alle andre reagerte på haren.</p>
-          `
-          : `<p><strong>Husketips:</strong> Den som lyver mest om hvor de sto, er ofte den som ikke vil kobles til tidslinjen.</p>`
+        `<p><strong>Regel:</strong> Den skyldige må ha hatt tid til å utnytte avledningen, være nær premiestativet og samtidig levere et alibi som ikke tåler klokkeslett.</p>`
       );
-      promptEl.textContent =
-        difficulty.level >= 4
-          ? "Hvem har den forklaringen som bryter tydeligst med tidslinjen?"
-          : "Hvem avsløres av tidslinjen?";
       helperEl.textContent = helperText(4);
-      addOptions(
-        optionPool(
-          { value: culprit.id, label: culprit.name },
-          suspects.map((suspect) => ({
-            value: suspect.id,
-            label: difficulty.level >= 5 ? `${suspect.name}: ${suspect.contradiction}` : suspect.name
-          })),
-          genericDecoys.suspects
-        )
-      );
-      successCopyEl.textContent =
-        difficulty.level >= 4
-          ? `${culprit.name} faller gjennom når klokkeslett, spor og forklaring presses mot hverandre. Nå sitter dere med en langt skarpere sak enn den tyven hadde håpet på.`
-          : `${culprit.name} klarer ikke få historien til å henge sammen. Nå blir avhøret betydelig mindre hyggelig.`;
+
+      if (difficulty.level >= 4) {
+        correctAnswer = normalizeAnswer(culprit.name);
+        promptEl.textContent = "Skriv navnet på personen som sprekker i tidslinjen.";
+        addInput("Skriv fullt navn eller fornavn", culprit.name);
+      } else {
+        correctAnswer = culprit.id;
+        promptEl.textContent = "Hvem avsløres av tidslinjen?";
+        addOptions(
+          optionPool(
+            { value: culprit.id, label: culprit.name },
+            suspects.map((suspect) => ({ value: suspect.id, label: suspect.name })),
+            genericDecoys.suspects
+          )
+        );
+      }
+
+      successCopyEl.textContent = `${culprit.name} faller gjennom når klokkeslett, varme og forklaring presses mot hverandre.`;
     }
 
     if (taskId === 5) {
-      correctAnswer = motive.id;
+      const motiveKeyword = motiveKeywordMap[motive.id];
       const phraseHint =
         motive.id === "sabotage"
           ? "INGEN"
@@ -391,44 +461,34 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
               : "AVTALE";
 
       addParagraphs([
-        `Ved kjøkkenbordet finner dere tre løse notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med ordet ${phraseHint}, og et avhørsnotat der ${culprit.name} ${culprit.interviewTell}.`,
+        `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med ordet ${phraseHint}, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
         difficulty.level >= 4
-          ? "På høyere nivå er dette ikke bare en vanlig motivoppgave. Dere må koble språket i brevet, tonen i avhøret og hele planen rundt tyveriet. Noen motiver passer til enkeltstående tyveri, mens andre passer til en person som også ville styre selve finalen."
+          ? "Dette er ikke lenger bare en motivoppgave. Dere må lese språk, tone og plan som ett mønster. Kodeordet dere finner skal peke direkte mot hvorfor tyven gjorde dette."
           : "Når dere legger brevlappen og avhørsglippene ved siden av hverandre, peker alt mot ett motiv."
       ]);
-      addMeta(
-        difficulty.level === 5
-          ? `
-            <p><strong>Kodeark:</strong> Første ord i notatene danner en pekepinn: ${
-              motive.id === "sabotage"
-                ? "ingen, finale, foran"
-                : motive.id === "swap"
-                  ? "kopien, originalen, trenger"
-                  : motive.id === "spotlight"
-                    ? "lyset, midnatt, meg"
-                    : "ingen, tilbake, avtale"
-            }.</p>
-            <p><strong>Krav for ekspert:</strong> Tenk både på hva tyven ville oppnå og hvordan hele planen var rigget for akkurat det utfallet.</p>
-          `
-          : difficulty.level === 4
-            ? `<p><strong>Kryssforhør:</strong> Et motiv som krever hemmelighold, passer ofte sammen med både avledning og senere kontroll over funnet.</p>`
-            : ""
-      );
-      promptEl.textContent =
-        difficulty.level >= 4
-          ? "Hvilket motiv passer best når brev, kodeord og avhørsglippene vurderes samlet?"
-          : "Hva var tyvens egentlige motiv?";
       helperEl.textContent = helperText(5);
-      addOptions(
-        optionPool(
-          { value: motive.id, label: motive.label },
-          motives.map((item) => ({
-            value: item.id,
-            label: difficulty.level >= 5 ? `${item.label} | nøkkelord: ${item.clueText}` : item.label
-          })),
-          genericDecoys.motives
-        )
-      );
+
+      if (difficulty.level >= 4) {
+        correctAnswer = normalizeAnswer(motiveKeyword);
+        promptEl.textContent = "Skriv motivkoden som står igjen når dere har tolket brevlappen riktig.";
+        addMeta(
+          difficulty.level === 5
+            ? `<p><strong>Ekspertkode:</strong> Nøkkelordet er ikke hele motivsetningen, men den korte koden etterforskerne ville skrive i margen. Dere er ute etter ett ord.</p>`
+            : `<p><strong>Kryssforhør:</strong> Velg den korte motivkoden, ikke hele forklaringen.</p>`
+        );
+        addInput("Skriv motivkode", motiveKeyword);
+      } else {
+        correctAnswer = motive.id;
+        promptEl.textContent = "Hva var tyvens egentlige motiv?";
+        addOptions(
+          optionPool(
+            { value: motive.id, label: motive.label },
+            motives.map((item) => ({ value: item.id, label: item.label })),
+            genericDecoys.motives
+          )
+        );
+      }
+
       successCopyEl.textContent = `${motive.revealText} Nå gjenstår bare sluttrapporten til ${agencyNames[3]}.`;
     }
 
@@ -439,13 +499,16 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     }
 
     submitEl?.addEventListener("click", () => {
-      if (!selected) {
-        feedbackEl.textContent = "Velg et svaralternativ først.";
+      const chosen = answerMode === "input" ? normalizeAnswer(selected) : selected;
+
+      if (!chosen) {
+        feedbackEl.textContent = answerMode === "input" ? "Skriv inn svaret først." : "Velg et svaralternativ først.";
         feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
         return;
       }
 
-      if (selected === correctAnswer) {
+      const expected = normalizeAnswer(correctAnswer);
+      if (normalizeAnswer(chosen) === expected) {
         runtime.markCompleted(progressKey, taskId);
         feedbackEl.textContent = "Riktig. Et nytt lag av saken faller på plass.";
         feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";

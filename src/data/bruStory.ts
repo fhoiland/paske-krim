@@ -51,7 +51,7 @@ export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
 export const statsKey = "bru-hytte-paskekrim-stats";
-export const caseVersion = 4;
+export const caseVersion = 5;
 
 export const agencyNames = [
   "Bruagentene",
@@ -61,12 +61,12 @@ export const agencyNames = [
   "Operasjon Gulrotblink"
 ];
 
-export const versionBadge = "v5.2.0 | Sertifisert av Bru Spesialenhet og minst én overivrig kakao-komité";
+export const versionBadge = "v6.0.0 | Nå med såpass mye påskekrim at selv Kripos avdeling Bru ba oss roe oss litt";
 
 export const introText = [
-  "Påskeaften på hytta på Bru skulle bli årets høydepunkt. Premiebordet var pyntet, snøen glitret blått i kveldssola, og alle ventet på avsløringen av det legendariske Bru-egget.",
-  "Så eksploderte hele tunet i kaos. Påskeharen skrek 'NEEEIIIIII!!', en liten mus med kaninører spratt gjennom snøen med sekken full av fargerike egg, og alle stormet ut for å se hva som foregikk.",
-  "Da folk kom inn igjen, var selve Bru-egget borte. Nå trenger hytta på Bru hjelp fra Bruagentene, Kripos avdeling Bru og alle som mener de er uvanlig gode til å følge snøspor og mistenkelig gulrotlogistikk."
+  "Påskeaften på hytta på Bru skulle bli årets store finale. Premiebordet sto klart, det legendariske Bru-egget lå under glasslokk, og alle gjestene ventet på den høytidelige avdukingen.",
+  "Så smalt sambandsradioen. Påskeharen skrek ute på tunet, en mus med kaninører raste gjennom snøen med en sekk småegg, og hele gjengen styrtet ut i det som senere ble omtalt som den mest unødvendig dramatiske gulrotkrisen i nyere Bru-historie.",
+  "Da alle kom inn igjen, var Bru-egget borte, glasslokket sto på gløtt, og flere vitneforklaringer passet mistenkelig dårlig sammen. Nå må dere lese logger, kodeord, tidslinjer og avhørsglipper langt skarpere enn før."
 ];
 
 export const difficulties: Difficulty[] = [
@@ -419,7 +419,7 @@ export const taskMeta: TaskMeta[] = [
     slug: "1",
     title: "Oppgave 1: Avledningen",
     scene: "Tunet foran hytta",
-    question: "Hva avslører egentlig bildet og kaoset på tunet?",
+    question: "Hva avslører sambandsloggen og kaoset rundt tunet egentlig?",
     nextHref: "/oppgave/2",
     nextLabel: "Videre til oppgave 2"
   },
@@ -437,7 +437,7 @@ export const taskMeta: TaskMeta[] = [
     slug: "3",
     title: "Oppgave 3: Kodelappen",
     scene: "Mellom verandaen og bekken",
-    question: "Hvor ble Bru-egget gjemt?",
+    question: "Hva skjuler kodelappen, og hvor peker den egentlig?",
     nextHref: "/oppgave/4",
     nextLabel: "Videre til oppgave 4"
   },
@@ -446,7 +446,7 @@ export const taskMeta: TaskMeta[] = [
     slug: "4",
     title: "Oppgave 4: Tidslinjebrudd",
     scene: "Ved peisen og notatveggen",
-    question: "Hvem avsløres av den sprukne tidslinjen?",
+    question: "Hvem sprekker når tidslinje, varme og vitneglipper presses mot hverandre?",
     nextHref: "/oppgave/5",
     nextLabel: "Videre til oppgave 5"
   },
@@ -455,7 +455,7 @@ export const taskMeta: TaskMeta[] = [
     slug: "5",
     title: "Oppgave 5: Kryssforhøret",
     scene: "Kjøkkenbordet etter midnatt",
-    question: "Hva var tyvens egentlige motiv når alle løse ord, bokstaver og glipper samles?",
+    question: "Hvilket kodeord og motiv står igjen når alle notater, glipper og mønstre samles?",
     nextHref: "/finale",
     nextLabel: "Gå til finalen"
   }
