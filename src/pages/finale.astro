@@ -184,6 +184,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const evidenceOptions = document.getElementById("final-evidence-options");
       const solveButton = document.getElementById("solve-finale");
       const state = { culprit: "", motive: "", hiding: "", evidence: [] };
+      const hasRelevantCaseBrief = Boolean(advancedCase?.final?.brief?.trim());
       difficultyCopy.textContent = advancedCase
         ? `${difficulty.title} | ${advancedCase.tagline}`
         : `${difficulty.title} | ${difficulty.humor}`;
@@ -195,8 +196,13 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         solveButton.textContent = "Lever anklage";
         evidenceShell.classList.remove("hidden");
         evidenceRule.textContent = advancedCase.final.evidenceRule;
-        caseBrief.classList.remove("hidden");
-        caseBriefCopy.textContent = advancedCase.final.brief;
+        if (hasRelevantCaseBrief) {
+          caseBrief.classList.remove("hidden");
+          caseBriefCopy.textContent = advancedCase.final.brief;
+        } else {
+          caseBrief.classList.add("hidden");
+          caseBriefCopy.textContent = "";
+        }
       }
 
       culpritOptions.innerHTML = suspects
