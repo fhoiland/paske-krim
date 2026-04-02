@@ -84,12 +84,22 @@
 
   function ensureCase(data) {
     const existing = readJson(data.caseKey, null);
-    if (existing && existing.version === data.caseVersion) {
+    const selectedDifficulty = data.difficulties?.find((item) => item.id === data.selectedDifficulty);
+    const selectedDifficultyId = selectedDifficulty?.id;
+
+    if (
+      existing &&
+      existing.version === data.caseVersion &&
+      (!selectedDifficultyId || existing.difficultyId === selectedDifficultyId)
+    ) {
       return existing;
     }
 
     const nextCase = createCase(data);
     writeJson(data.caseKey, nextCase);
+    if (data.progressKey) {
+      writeJson(data.progressKey, { started: true, completed: [] });
+    }
     return nextCase;
   }
 
