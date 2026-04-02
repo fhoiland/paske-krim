@@ -13,7 +13,7 @@ import {
   settingsKey,
   statsKey,
   storyTitle,
-  suspects,
+  suspectRosters,
   totalTasks
 } from "../data/bruStory";
 
@@ -98,17 +98,13 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         <div class="mt-5 grid gap-4">
           <div class="dossier-card">
             <p class="dossier-label">Mistenkte i omløp</p>
-            <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
-              {suspects.map((suspect) => (
-                <li><strong>{suspect.name}</strong>: {suspect.role}</li>
-              ))}
-            </ul>
+            <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700" id="roster-preview"></ul>
           </div>
 
           <div class="dossier-card">
             <p class="dossier-label">Hva varierer i hver runde?</p>
             <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
-              <li>{suspects.length} mistenkte, og minst én oppfører seg dramatisk uten grunn.</li>
+              <li id="roster-count">Ulike antall mistenkte, avhengig av vanskelighetsgrad.</li>
               <li>{motives.length} motiver, fra sabotasje til ren oppmerksomhetsnød.</li>
               <li>{hidingSpots.length} skjulesteder med svært tvilsom påskelogistikk.</li>
             </ul>
@@ -136,7 +132,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         progressKey,
         settingsKey,
         statsKey,
-        suspects,
+        suspectRosters,
         totalTasks
       }}
     >
@@ -145,6 +141,8 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const continueButton = document.getElementById("continue-story");
       const difficultyLabel = document.getElementById("difficulty-current-label");
       const bestTimeLabel = document.getElementById("best-time-label");
+      const rosterPreview = document.getElementById("roster-preview");
+      const rosterCount = document.getElementById("roster-count");
       const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
       const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
       const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
@@ -159,7 +157,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           motives,
           progressKey,
           selectedDifficulty: difficultyId,
-          suspects
+          suspects: suspectRosters[difficultyId] || suspectRosters[defaultDifficulty.id]
         };
       }
 
@@ -173,8 +171,13 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         const active = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
         const stats = runtime.readStats(statsKey);
         const best = stats.bestTimes?.[active.id];
+        const roster = suspectRosters[active.id] || [];
         difficultyLabel.textContent = `${active.title} valgt`;
         bestTimeLabel.textContent = best ? runtime.formatDuration(best) : "Ingen løst ennå";
+        rosterPreview.innerHTML = roster
+          .map((suspect) => `<li><strong>${suspect.name}</strong>: ${suspect.role}</li>`)
+          .join("");
+        rosterCount.textContent = `${roster.length} mistenkte på dette nivået, og minst én oppfører seg dramatisk uten grunn.`;
         difficultyButtons.forEach((button) => {
           const isActive = button.dataset.difficulty === selectedDifficulty;
           button.classList.toggle("selected-difficulty", isActive);

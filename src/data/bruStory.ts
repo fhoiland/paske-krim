@@ -6,6 +6,8 @@ export type Suspect = {
   clueItem: string;
   clueDetail: string;
   alibi: string;
+  contradiction: string;
+  interviewTell: string;
 };
 
 export type Motive = {
@@ -49,7 +51,7 @@ export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
 export const statsKey = "bru-hytte-paskekrim-stats";
-export const caseVersion = 3;
+export const caseVersion = 4;
 
 export const agencyNames = [
   "Bruagentene",
@@ -58,6 +60,8 @@ export const agencyNames = [
   "Påskeberedskapen på Bru",
   "Operasjon Gulrotblink"
 ];
+
+export const versionBadge = "v5.2.0 | Sertifisert av Bru Spesialenhet og minst én overivrig kakao-komité";
 
 export const introText = [
   "Påskeaften på hytta på Bru skulle bli årets høydepunkt. Premiebordet var pyntet, snøen glitret blått i kveldssola, og alle ventet på avsløringen av det legendariske Bru-egget.",
@@ -71,8 +75,8 @@ export const difficulties: Difficulty[] = [
     level: 1,
     title: "Grad 1: Småsporeren",
     shortLabel: "3 år",
-    description: "Ekstra tydelige spor, få alternativer og nesten komisk åpenbare svar.",
-    humor: "Anbefalt av Bru barnehage og harepatruljen for små snødetektiver.",
+    description: "Veldig tydelige spor, få valg og en sak som nærmest peker på seg selv.",
+    humor: "Anbefalt av Bru barnehage og harepatruljen for små superdetektiver.",
     optionCount: 2,
     helperStrength: "max"
   },
@@ -80,9 +84,9 @@ export const difficulties: Difficulty[] = [
     id: "snosnute",
     level: 2,
     title: "Grad 2: Snøsnuta",
-    shortLabel: "Nybegynner",
-    description: "Litt mer lureri, men fortsatt trygt for ferske påskeetterforskere.",
-    humor: "For de som kan telle til tre og mistenke minst én nabo.",
+    shortLabel: "Lett",
+    description: "En snill, men ekte liten påskekrim med noen bløffer og litt tenking.",
+    humor: "For dem som kan telle til tre, men fortsatt vil ha kakao-hint.",
     optionCount: 3,
     helperStrength: "high"
   },
@@ -91,7 +95,7 @@ export const difficulties: Difficulty[] = [
     level: 3,
     title: "Grad 3: Sporhund",
     shortLabel: "Vanlig",
-    description: "Balansen mellom moro, spor og faktisk tenking.",
+    description: "Mer sammenheng mellom sporene og mindre gratis hjelp.",
     humor: "Standardnivået til Bru Spesialenhet for Eggrelaterte Hendelser.",
     optionCount: 4,
     helperStrength: "medium"
@@ -101,7 +105,7 @@ export const difficulties: Difficulty[] = [
     level: 4,
     title: "Grad 4: Kripos avdeling Bru",
     shortLabel: "Vanskelig",
-    description: "Tettere spor, mer misledning og mindre håndholding.",
+    description: "Tettere spor, flere mistenkte og lengre oppgaver med ordentlig kryssjekking.",
     humor: "For dem som mumler 'jeg stoler ikke på noen' før kakao nummer to.",
     optionCount: 5,
     helperStrength: "low"
@@ -111,51 +115,245 @@ export const difficulties: Difficulty[] = [
     level: 5,
     title: "Grad 5: Avanserte kodeknekkere",
     shortLabel: "Ekspert",
-    description: "Maks trøbbel. Flere bløffer, strammere hint og mer kodespråk i sporene.",
-    humor: "Bare for dem som blir fornærmet hvis saken er løst før appelsinen er skrelt.",
+    description: "Lang sak, mange mistenkte, tynne spor og oppgaver som krever faktisk kodeknekk.",
+    humor: "Bare for dem som blir fornærmet hvis saken løses før appelsinen er skrelt.",
     optionCount: 6,
     helperStrength: "minimal"
   }
 ];
 
-export const suspects: Suspect[] = [
-  {
-    id: "oskar",
-    name: "Oskar Bruvik",
-    role: "naboen i blå parkas",
-    style: "snakker rolig, men følger alltid med på alt som skjer rundt premiebordet og later som om han bare studerer været",
-    clueItem: "blå skismøring",
-    clueDetail: "et blankt blått merke langs kanten av premiepallen",
-    alibi: "hevdet at han bare sto ved vedstabelen og drev avansert værforskning med hendene i lomma"
-  },
-  {
-    id: "pelle",
-    name: "Pelle Påskehare",
-    role: "den teatralske arrangementsverten",
-    style: "lager store entréer, roper høyt og mener alle problemer kan løses med mer konfetti",
-    clueItem: "gult sceneglitter",
-    clueDetail: "små gule glimt inne i smeltet snø ved den tomme eggsokkelen",
-    alibi: "påsto at han var for opptatt med å rope så høyt at hele Bru skulle høre det"
-  },
-  {
-    id: "lovise",
-    name: "Lovise Lyng",
-    role: "påskemaleren med fiolette fingre",
-    style: "ser uskyldig ut, men er ekstremt opptatt av detaljer, premier og hvem som får æren",
-    clueItem: "fiolett eggmaling",
-    clueDetail: "en tynn stripe fiolett maling bak silkeduken på premiebordet",
-    alibi: "insisterte på at hun sto ved kakaoen hele tiden og bare bedømte marshmallow-kvalitet"
-  },
-  {
-    id: "milla",
-    name: "Milla Musetind",
-    role: "oppfinneren bak påskemus-showet",
-    style: "smiler lurt, trener små dyr og har alltid en altfor kreativ plan ingen ba om",
-    clueItem: "stripet gulrottråd",
-    clueDetail: "en tynn gulrotfarget tråd hektet fast i kanten av premieduken",
-    alibi: "sa at hun bare jaget musen ute og slett ikke hadde tid til hovedforbrytelser"
-  }
-];
+export const suspectRosters: Record<string, Suspect[]> = {
+  trearing: [
+    {
+      id: "malin",
+      name: "Malin",
+      role: "den snille påskemaleren",
+      style: "smiler bredt, får maling overalt og later som om alt er tilfeldig",
+      clueItem: "gul maling",
+      clueDetail: "en liten gul malingsprikk ved sokkelen",
+      alibi: "sa at hun bare malte egg ved vinduet hele tiden",
+      contradiction: "påstår at hun aldri gikk inn i stua, men malingsprikken hennes ligger ved selve premiebordet",
+      interviewTell: "hun sier 'oi da' så ofte at selv harepatruljen blir mistenksomme"
+    },
+    {
+      id: "loke",
+      name: "Loke",
+      role: "den raske snøløperen",
+      style: "løper fort, tramper høyt og blir altfor stolt når han finner spor først",
+      clueItem: "blå snøtråkk",
+      clueDetail: "to tydelige blå snøtråkk rett ved duken",
+      alibi: "hevdet at han bare var ute og telte fargerike egg",
+      contradiction: "sier at han sto ute hele tiden, men snøtråkkene hans fortsetter inn i hytta",
+      interviewTell: "glemmer alltid hvilken fot som var våt"
+    }
+  ],
+  snosnute: [
+    {
+      id: "jorgen",
+      name: "Jørgen",
+      role: "den ivrige vedbæreren",
+      style: "slepper ved overalt og tror all etterforskning blir bedre av å peke dramatisk",
+      clueItem: "vedstøv",
+      clueDetail: "et lite bånd av vedstøv bak silkeduken",
+      alibi: "sa at han kun var på verandaen og drev med ved og været",
+      contradiction: "hevder han ikke var inne, men støvet hans stopper ved den tomme eggsokkelen",
+      interviewTell: "blunker dobbelt hver gang noen sier ordet 'premiebord'"
+    },
+    {
+      id: "kristian",
+      name: "Kristian",
+      role: "den rolige kakaoansvarlige",
+      style: "virker trygg, men holder koppen sin som om den skjuler statshemmeligheter",
+      clueItem: "kakaodrypp",
+      clueDetail: "et søtt kakaodrypp helt inntil sokkelen",
+      alibi: "insisterte på at han holdt seg ved kjøkkenbenken hele tiden",
+      contradiction: "sa at koppen aldri forlot kjøkkenet, men dryppet fortsetter mot premiebordet",
+      interviewTell: "svarer veldig fort når ingen har anklaget ham ennå"
+    },
+    {
+      id: "hedda",
+      name: "Hedda",
+      role: "den detaljfikserte påskepyntsjefen",
+      style: "retter på servietter, sløyfer og mennesker med samme alvor",
+      clueItem: "oransje båndtråd",
+      clueDetail: "en oransje båndtråd som sitter fast i duken",
+      alibi: "sa at hun bare pyntet gangen og ikke rørte premiebordet",
+      contradiction: "hevder hun sto i gangen, men båndet hennes er hektet i duken ved egget",
+      interviewTell: "smiler litt for bredt når noen nevner orden"
+    }
+  ],
+  sporhund: [
+    {
+      id: "jorgen",
+      name: "Jørgen",
+      role: "den ivrige vedbæreren",
+      style: "slepper ved overalt og tror all etterforskning blir bedre av å peke dramatisk",
+      clueItem: "vedstøv",
+      clueDetail: "et lite bånd av vedstøv bak silkeduken",
+      alibi: "sa at han kun var på verandaen og drev med ved og været",
+      contradiction: "hevder han ikke var inne, men støvet hans stopper ved den tomme eggsokkelen",
+      interviewTell: "blunker dobbelt hver gang noen sier ordet 'premiebord'"
+    },
+    {
+      id: "kristian",
+      name: "Kristian",
+      role: "den rolige kakaoansvarlige",
+      style: "virker trygg, men holder koppen sin som om den skjuler statshemmeligheter",
+      clueItem: "kakaodrypp",
+      clueDetail: "et søtt kakaodrypp helt inntil sokkelen",
+      alibi: "insisterte på at han holdt seg ved kjøkkenbenken hele tiden",
+      contradiction: "sa at koppen aldri forlot kjøkkenet, men dryppet fortsetter mot premiebordet",
+      interviewTell: "svarer veldig fort når ingen har anklaget ham ennå"
+    },
+    {
+      id: "hedda",
+      name: "Hedda",
+      role: "den detaljfikserte påskepyntsjefen",
+      style: "retter på servietter, sløyfer og mennesker med samme alvor",
+      clueItem: "oransje båndtråd",
+      clueDetail: "en oransje båndtråd som sitter fast i duken",
+      alibi: "sa at hun bare pyntet gangen og ikke rørte premiebordet",
+      contradiction: "hevder hun sto i gangen, men båndet hennes er hektet i duken ved egget",
+      interviewTell: "smiler litt for bredt når noen nevner orden"
+    }
+  ],
+  kripos: [
+    {
+      id: "tove",
+      name: "Tove",
+      role: "den metodiske løypeføreren",
+      style: "noterer alt i små blokker og virker mistenkelig komfortabel med tidslinjer",
+      clueItem: "røde skivoksspor",
+      clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
+      alibi: "hevdet at hun bare målte snødybde ved brua og aldri gikk inn",
+      contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
+      interviewTell: "siterer klokkeslett litt for presist uten å ha blitt spurt"
+    },
+    {
+      id: "siw",
+      name: "Siw",
+      role: "den elegante premiebordansvarlige",
+      style: "retter på duker med ro og ser fornærmet ut hvis noen puster nær serviettene",
+      clueItem: "glitterstøv",
+      clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
+      alibi: "sa at hun var i gangen og beroliget haren hele tiden",
+      contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
+      interviewTell: "sukker før hvert svar som om avhøret er under hennes nivå"
+    },
+    {
+      id: "therese",
+      name: "Therese",
+      role: "den teatralske dekorbyggeren",
+      style: "snakker i store bilder og mener belysning er viktigere enn sannhet",
+      clueItem: "fiolett tape",
+      clueDetail: "en tynn stripe fiolett tape bak duken",
+      alibi: "påsto at hun testet lysslyngene ute på verandaen",
+      contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
+      interviewTell: "svarer med tre detaljer når ett ord hadde holdt"
+    },
+    {
+      id: "inge",
+      name: "Inge",
+      role: "den stille logistikksjefen",
+      style: "bærer ting uten å lage lyd og liker at alle tror han bare ordner praktiske småting",
+      clueItem: "grå sekketråd",
+      clueDetail: "en grå fibertråd som sitter fast i dukekanten",
+      alibi: "sa at han sto ved vedkassen og ryddet tauverk",
+      contradiction: "hevder han bare håndterte tau ute, men en lik fibertråd sitter i silkeduken inne",
+      interviewTell: "nikker før han svarer, som om han først godkjenner sin egen løgn"
+    },
+    {
+      id: "jan",
+      name: "Jan",
+      role: "den joviale grillmesteren uten grill",
+      style: "ler høyt, tar plass og tror at godt humør teller som alibi",
+      clueItem: "røykstøv",
+      clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
+      alibi: "insisterte på at han bare sto på tunet og fortalte lange historier",
+      contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
+      interviewTell: "skifter tema til pølser når spørsmålene blir konkrete"
+    },
+    {
+      id: "fredrik",
+      name: "Fredrik",
+      role: "den tekniske dørvokteren",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert",
+      clueItem: "kobberstøv",
+      clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
+      alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget",
+      contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
+      interviewTell: "bruker ordet 'teknisk sett' når sannheten begynner å vingle"
+    }
+  ],
+  kodeknekker: [
+    {
+      id: "tove",
+      name: "Tove",
+      role: "den metodiske løypeføreren",
+      style: "noterer alt i små blokker og virker mistenkelig komfortabel med tidslinjer",
+      clueItem: "røde skivoksspor",
+      clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
+      alibi: "hevdet at hun bare målte snødybde ved brua og aldri gikk inn",
+      contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
+      interviewTell: "siterer klokkeslett litt for presist uten å ha blitt spurt"
+    },
+    {
+      id: "siw",
+      name: "Siw",
+      role: "den elegante premiebordansvarlige",
+      style: "retter på duker med ro og ser fornærmet ut hvis noen puster nær serviettene",
+      clueItem: "glitterstøv",
+      clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
+      alibi: "sa at hun var i gangen og beroliget haren hele tiden",
+      contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
+      interviewTell: "sukker før hvert svar som om avhøret er under hennes nivå"
+    },
+    {
+      id: "therese",
+      name: "Therese",
+      role: "den teatralske dekorbyggeren",
+      style: "snakker i store bilder og mener belysning er viktigere enn sannhet",
+      clueItem: "fiolett tape",
+      clueDetail: "en tynn stripe fiolett tape bak duken",
+      alibi: "påsto at hun testet lysslyngene ute på verandaen",
+      contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
+      interviewTell: "svarer med tre detaljer når ett ord hadde holdt"
+    },
+    {
+      id: "inge",
+      name: "Inge",
+      role: "den stille logistikksjefen",
+      style: "bærer ting uten å lage lyd og liker at alle tror han bare ordner praktiske småting",
+      clueItem: "grå sekketråd",
+      clueDetail: "en grå fibertråd som sitter fast i dukekanten",
+      alibi: "sa at han sto ved vedkassen og ryddet tauverk",
+      contradiction: "hevder han bare håndterte tau ute, men en lik fibertråd sitter i silkeduken inne",
+      interviewTell: "nikker før han svarer, som om han først godkjenner sin egen løgn"
+    },
+    {
+      id: "jan",
+      name: "Jan",
+      role: "den joviale grillmesteren uten grill",
+      style: "ler høyt, tar plass og tror at godt humør teller som alibi",
+      clueItem: "røykstøv",
+      clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
+      alibi: "insisterte på at han bare sto på tunet og fortalte lange historier",
+      contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
+      interviewTell: "skifter tema til pølser når spørsmålene blir konkrete"
+    },
+    {
+      id: "fredrik",
+      name: "Fredrik",
+      role: "den tekniske dørvokteren",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert",
+      clueItem: "kobberstøv",
+      clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
+      alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget",
+      contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
+      interviewTell: "bruker ordet 'teknisk sett' når sannheten begynner å vingle"
+    }
+  ]
+};
 
 export const motives: Motive[] = [
   {
@@ -246,9 +444,18 @@ export const taskMeta: TaskMeta[] = [
   {
     id: 4,
     slug: "4",
-    title: "Oppgave 4: Brennmerket brev",
-    scene: "Ved peisen",
-    question: "Hva var tyvens egentlige motiv?",
+    title: "Oppgave 4: Tidslinjebrudd",
+    scene: "Ved peisen og notatveggen",
+    question: "Hvem avsløres av den sprukne tidslinjen?",
+    nextHref: "/oppgave/5",
+    nextLabel: "Videre til oppgave 5"
+  },
+  {
+    id: 5,
+    slug: "5",
+    title: "Oppgave 5: Kryssforhøret",
+    scene: "Kjøkkenbordet etter midnatt",
+    question: "Hva var tyvens egentlige motiv når alle løse ord, bokstaver og glipper samles?",
     nextHref: "/finale",
     nextLabel: "Gå til finalen"
   }

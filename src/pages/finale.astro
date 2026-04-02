@@ -11,7 +11,7 @@ import {
   progressKey,
   settingsKey,
   statsKey,
-  suspects,
+  suspectRosters,
   totalTasks
 } from "../data/bruStory";
 
@@ -24,7 +24,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
   <StoryShell title="Finalen: Hvem tok Bru-egget?" eyebrow="Siste side" kicker="Lukk saken">
     <Fragment slot="lead">
       <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
-        Nå må dere samle alt: avledningen, sportsbeviset, kodelappen og brevet i peisen. Når alle tre
+        Nå må dere samle alt: avledningen, sportsbeviset, kodelappen, tidslinjebruddet og kryssforhøret. Når alle tre
         sluttvalg er riktige, får dere hele avsløringen og kan sende rapporten tilbake til Bruagentene.
       </p>
     </Fragment>
@@ -35,11 +35,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         <div class="mt-5 grid gap-6">
           <section>
             <p class="font-semibold text-stone-700">1. Hvem sto bak tyveriet?</p>
-            <div class="mt-3 grid gap-3" data-group="culprit">
-              {suspects.map((suspect) => (
-                <button class="option-btn" data-option={suspect.id} type="button">{suspect.name}</button>
-              ))}
-            </div>
+            <div class="mt-3 grid gap-3" data-group="culprit" id="final-culprit-options"></div>
           </section>
 
           <section>
@@ -102,7 +98,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           </p>
           <div class="dossier-card">
             <p class="dossier-label">Fullført løype</p>
-            <p class="mt-2 font-semibold text-stone-900">Avledning, sporrom, kodelapp, motivbrev og sluttrapport</p>
+            <p class="mt-2 font-semibold text-stone-900">Avledning, sporrom, kodelapp, tidslinjebrudd, kryssforhør og sluttrapport</p>
           </div>
           <div class="dossier-card">
             <p class="dossier-label">Aktiv vanskelighetsgrad</p>
@@ -130,7 +126,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         progressKey,
         settingsKey,
         statsKey,
-        suspects,
+        suspectRosters,
         totalTasks
       }}
     >
@@ -138,6 +134,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
       const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
       const selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+      const suspects = suspectRosters[selectedDifficulty] || suspectRosters[defaultDifficulty.id];
       const caseData = {
         caseKey,
         caseVersion,
@@ -168,6 +165,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const timeCopy = document.getElementById("final-time-copy");
       const bestCopy = document.getElementById("final-best-copy");
       const shareButton = document.getElementById("share-report");
+      const culpritOptions = document.getElementById("final-culprit-options");
       const state = { culprit: "", motive: "", hiding: "" };
       let solvedSummary = "";
       let solvedOnce = false;
@@ -180,6 +178,10 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       bestCopy.textContent = currentBest
         ? `Beste tid på dette nivået: ${runtime.formatDuration(currentBest)}`
         : "Ingen registrert rekord på dette nivået ennå.";
+
+      culpritOptions.innerHTML = suspects
+        .map((suspect) => `<button class="option-btn" data-option="${suspect.id}" type="button">${suspect.name}</button>`)
+        .join("");
 
       function rankLabel(ms, level) {
         const seconds = Math.floor(ms / 1000);
