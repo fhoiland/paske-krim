@@ -28,7 +28,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <Fragment slot="lead">
       <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         {agencyNames[0]}, {agencyNames[1]} og hele {agencyNames[2]} trenger hjelp. Velg vanskelighetsgrad,
-        les briefen, møt de mistenkte og gå videre til saken når du er klar.
+        les briefen og gå videre til saken når du er klar.
       </p>
     </Fragment>
 
@@ -39,25 +39,13 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           {storyBranches.family.intro.map((paragraph) => <p>{paragraph}</p>)}
         </div>
 
-        <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div class="dossier-card">
-            <p class="dossier-label">Format</p>
-            <p class="mt-2 font-semibold text-stone-900">Forside + briefing + {totalTasks} oppgaver + finale</p>
-          </div>
-          <div class="dossier-card">
-            <p class="dossier-label">Sakstjeneste</p>
-            <p class="mt-2 font-semibold text-stone-900">{agencyNames[3]} står klar med kakao og mistanke.</p>
-          </div>
-          <div class="dossier-card sm:col-span-2 lg:col-span-1">
-            <p class="dossier-label">Beste tid på valgt nivå</p>
-            <p class="mt-2 font-serif text-3xl text-stone-900" id="best-time-label">Ingen løst ennå</p>
-          </div>
-        </div>
-
         <section class="mt-8">
           <div class="flex items-center justify-between gap-3">
             <span class="section-pill">Velg vanskelighetsgrad</span>
-            <p class="text-sm font-semibold text-orange-900" id="difficulty-current-label">Laster nivå...</p>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-orange-900" id="difficulty-current-label">Laster nivå...</p>
+              <p class="text-xs text-stone-600" id="best-time-label">Ingen løst ennå</p>
+            </div>
           </div>
 
           <div class="mt-4 grid gap-3">

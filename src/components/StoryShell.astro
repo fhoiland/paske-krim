@@ -4,9 +4,10 @@ interface Props {
   eyebrow?: string;
   kicker?: string;
   showBurst?: boolean;
+  showImage?: boolean;
 }
 
-const { title, eyebrow = "Påskekrim", kicker, showBurst = true } = Astro.props;
+const { title, eyebrow = "Påskekrim", kicker, showBurst = true, showImage = true } = Astro.props;
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -23,29 +24,33 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <span class="section-pill self-center sm:self-auto">{eyebrow}</span>
   </header>
 
-  <section class="grid gap-4 sm:gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-    <article class="hero-card min-h-[220px] sm:min-h-[270px]">
-      {kicker && <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-900/80 sm:text-sm sm:tracking-[0.24em]">{kicker}</p>}
-      <h1 class="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.05] text-stone-950 sm:text-5xl">{title}</h1>
-      <slot name="lead" />
-      <div class="mt-5 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
-        <span class="case-chip">Påske-kaos</span>
-        <span class="case-chip">Bru-egget</span>
-        <span class="case-chip">Tilfeldig tyv</span>
-        <span class="case-chip">Nye spor hver runde</span>
-      </div>
-    </article>
+  {showImage ? (
+    <section class="grid gap-4 sm:gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+      <article class="hero-card min-h-[220px] sm:min-h-[270px]">
+        {kicker && <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-900/80 sm:text-sm sm:tracking-[0.24em]">{kicker}</p>}
+        <h1 class="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.05] text-stone-950 sm:text-5xl">{title}</h1>
+        <slot name="lead" />
+      </article>
 
-    <aside class="image-stage order-first max-h-[280px] lg:order-none lg:max-h-none">
-      {showBurst && <div class="comic-burst">NEEEIIIIII!!</div>}
-      <img
-        src={`${basePath}bru-paskekrim.png`}
-        alt="Påskekrim ved hytta på Bru med mus, hare og fargerike påskeegg i snøen"
-        class="h-full max-h-[280px] w-full object-cover lg:max-h-none"
-      />
-      <div class="image-fade"></div>
-    </aside>
-  </section>
+      <aside class="image-stage order-first max-h-[280px] lg:order-none lg:max-h-none">
+        {showBurst && <div class="comic-burst">NEEEIIIIII!!</div>}
+        <img
+          src={`${basePath}bru-paskekrim.png`}
+          alt="Påskekrim ved hytta på Bru med mus, hare og fargerike påskeegg i snøen"
+          class="h-full max-h-[280px] w-full object-cover lg:max-h-none"
+        />
+        <div class="image-fade"></div>
+      </aside>
+    </section>
+  ) : (
+    <section>
+      <article class="hero-card">
+        {kicker && <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-900/80 sm:text-sm sm:tracking-[0.24em]">{kicker}</p>}
+        <h1 class="mt-3 max-w-3xl font-serif text-[2rem] leading-[1.05] text-stone-950 sm:text-5xl">{title}</h1>
+        <slot name="lead" />
+      </article>
+    </section>
+  )}
 
   <slot />
 </main>

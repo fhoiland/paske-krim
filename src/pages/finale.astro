@@ -3,7 +3,6 @@ import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
 import { advancedCases } from "../data/advancedCases";
 import {
-  agencyNames,
   caseKey,
   caseVersion,
   difficulties,
@@ -22,11 +21,10 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 ---
 
 <MainLayout title="Finale | Påskekrimmen på Bru">
-  <StoryShell title="Finalen: Hvem tok Bru-egget?" eyebrow="Siste side" kicker="Lukk saken">
+  <StoryShell title="Finalen: Hvem tok Bru-egget?" eyebrow="Siste side" kicker="Lukk saken" showImage={false}>
     <Fragment slot="lead">
       <p id="final-lead-copy" class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
-        Nå må dere samle alt: avledningen, sportsbeviset, kodelappen, tidslinjebruddet og kryssforhøret. Når alle tre
-        sluttvalg er riktige, får dere hele avsløringen og kan sende rapporten tilbake til Bruagentene.
+        Nå må dere samle alt og bygge en anklage som faktisk holder.
       </p>
     </Fragment>
 
@@ -75,13 +73,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           <div class="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
-              id="share-report"
-              class="inline-flex rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
-            >
-              Kopier rapport
-            </button>
-            <button
-              type="button"
               id="restart-case"
               class="inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
             >
@@ -99,29 +90,19 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       </article>
 
       <article class="panel-card">
-        <span class="section-pill">Sammendrag</span>
+        <span class="section-pill">Status</span>
         <div class="mt-5 space-y-4 leading-8 text-stone-700">
-          <p id="final-agency-copy"></p>
           <div id="final-case-brief" class="hidden dossier-card">
             <p class="dossier-label">Casebrief</p>
             <p id="final-case-brief-copy" class="mt-2 text-sm leading-7 text-stone-700"></p>
           </div>
-          <p>
-            Når dere starter på nytt, nullstilles saken skikkelig. Ingen gamle spor, ingen hengende lokal
-            state og ingen gjenbruk av forrige finale som later som den fortsatt er aktuell.
-          </p>
           <div class="dossier-card">
-            <p class="dossier-label">Fullført løype</p>
-            <p class="mt-2 font-semibold text-stone-900">Avledning, sporrom, kodelapp, tidslinjebrudd, kryssforhør og sluttrapport</p>
-          </div>
-          <div class="dossier-card">
-            <p class="dossier-label">Aktiv vanskelighetsgrad</p>
+            <p class="dossier-label">Nivå</p>
             <p id="final-difficulty-copy" class="mt-2 font-semibold text-stone-900">Laster nivå ...</p>
           </div>
           <div class="dossier-card">
-            <p class="dossier-label">Sakstid</p>
+            <p class="dossier-label">Tid</p>
             <p id="final-time-copy" class="mt-2 font-semibold text-stone-900">Laster tid ...</p>
-            <p id="final-best-copy" class="mt-2 text-sm font-semibold text-orange-900">Laster rekord ...</p>
           </div>
         </div>
       </article>
@@ -130,7 +111,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <script
       is:inline
       define:vars={{
-        agencyNames,
         advancedCases,
         basePath,
         caseKey,
@@ -194,33 +174,20 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const analysisCopy = document.getElementById("final-analysis-copy");
       const revealBox = document.getElementById("final-success");
       const revealCopy = document.getElementById("final-reveal-copy");
-      const agencyCopy = document.getElementById("final-agency-copy");
       const caseBrief = document.getElementById("final-case-brief");
       const caseBriefCopy = document.getElementById("final-case-brief-copy");
       const difficultyCopy = document.getElementById("final-difficulty-copy");
       const timeCopy = document.getElementById("final-time-copy");
-      const bestCopy = document.getElementById("final-best-copy");
-      const shareButton = document.getElementById("share-report");
       const culpritOptions = document.getElementById("final-culprit-options");
       const evidenceShell = document.getElementById("final-evidence-shell");
       const evidenceRule = document.getElementById("final-evidence-rule");
       const evidenceOptions = document.getElementById("final-evidence-options");
       const solveButton = document.getElementById("solve-finale");
       const state = { culprit: "", motive: "", hiding: "", evidence: [] };
-      let solvedSummary = "";
-      let solvedOnce = false;
-
-      agencyCopy.textContent = advancedCase
-        ? `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} vil ha en stram anklage, ikke en dramatisk magefølelse.`
-        : `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} er klare til å arkivere saken, men bare hvis rapporten deres ikke lukter ren gjetting.`;
       difficultyCopy.textContent = advancedCase
         ? `${difficulty.title} | ${advancedCase.tagline}`
         : `${difficulty.title} | ${difficulty.humor}`;
       timeCopy.textContent = runtime.formatDuration(runtime.elapsedMs(caseFile));
-      const currentBest = runtime.readStats(statsKey).bestTimes?.[difficulty.id];
-      bestCopy.textContent = currentBest
-        ? `Beste tid på dette nivået: ${runtime.formatDuration(currentBest)}`
-        : "Ingen registrert rekord på dette nivået ennå.";
 
       if (advancedCase) {
         leadCopy.textContent =
@@ -255,15 +222,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             `
           )
           .join("");
-      }
-
-      function rankLabel(ms, level) {
-        const seconds = Math.floor(ms / 1000);
-        if (level === 1) return "Miniagent med gulrotsertifikat";
-        if (seconds < 90) return "Bru-legende";
-        if (seconds < 150) return "Kripos avdeling Bru";
-        if (seconds < 240) return "Skarp sporhund";
-        return "Seig, men stødig kodeknekker";
       }
 
       document.querySelectorAll("[data-group]").forEach((group) => {
@@ -314,37 +272,24 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           advancedCase.decisiveEvidenceIds.every((id) => state.evidence.includes(id))
         ) {
           const elapsed = runtime.elapsedMs(caseFile);
-          const result = runtime.recordBestTime(statsKey, difficulty.id, elapsed);
-          const rank = rankLabel(elapsed, difficulty.level);
-          solvedSummary =
-            `Sak Bru-${caseFile.caseNumber} løst på ${runtime.formatDuration(elapsed)}. Rang: ${rank}. ` +
-            `Tyv: ${culprit.name}. Motiv: ${motive.label}. Gjemmested: ${hidingSpot.label}.`;
-          solvedOnce = true;
+          runtime.recordBestTime(statsKey, difficulty.id, elapsed);
           timeCopy.textContent = runtime.formatDuration(elapsed);
           feedback.textContent = "Anklagen holder.";
           feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
           analysisBox.classList.add("hidden");
-          revealCopy.textContent =
-            `${advancedCase.final.success} Rang oppnådd: ${rank}. ${result.isRecord ? "Ny rekord på dette nivået." : `Beste tid står fortsatt på ${runtime.formatDuration(result.best)}.`}`;
-          bestCopy.textContent = `Beste tid på dette nivået: ${runtime.formatDuration(result.best)}`;
+          revealCopy.textContent = advancedCase.final.success;
           revealBox.classList.remove("hidden");
           return;
         }
 
         if (!advancedCase && state.culprit === culprit.id && state.motive === motive.id && state.hiding === hidingSpot.id) {
           const elapsed = runtime.elapsedMs(caseFile);
-          const result = runtime.recordBestTime(statsKey, difficulty.id, elapsed);
-          const rank = rankLabel(elapsed, difficulty.level);
-          solvedSummary =
-            `Sak Bru-${caseFile.caseNumber} løst på ${runtime.formatDuration(elapsed)}. Rang: ${rank}. ` +
-            `Tyv: ${culprit.name}. Motiv: ${motive.label}. Gjemmested: ${hidingSpot.label}.`;
-          solvedOnce = true;
+          runtime.recordBestTime(statsKey, difficulty.id, elapsed);
           timeCopy.textContent = runtime.formatDuration(elapsed);
           feedback.textContent = "Saken er løst.";
           feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
           revealCopy.textContent =
-            `${culprit.name} sto bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble funnet ${hidingSpot.label}. Rang oppnådd: ${rank}. ${result.isRecord ? "Ny rekord på dette nivået." : `Beste tid står fortsatt på ${runtime.formatDuration(result.best)}.`} ${agencyNames[0]} kaller dette en forbilledlig seier for norsk hytteetterforskning.`;
-          bestCopy.textContent = `Beste tid på dette nivået: ${runtime.formatDuration(result.best)}`;
+            `${culprit.name} sto bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble funnet ${hidingSpot.label}.`;
           revealBox.classList.remove("hidden");
         } else {
           if (advancedCase) {
@@ -374,23 +319,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             feedback.textContent = "Nesten. Les gjennom sporene igjen og prøv en ny kombinasjon.";
             feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
           }
-        }
-      });
-
-      shareButton?.addEventListener("click", async () => {
-        if (!solvedOnce || !solvedSummary) {
-          feedback.textContent = "Løs saken først før du kopierer rapporten.";
-          feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
-          return;
-        }
-
-        try {
-          await navigator.clipboard.writeText(solvedSummary);
-          feedback.textContent = "Rapport kopiert til utklippstavlen.";
-          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
-        } catch {
-          feedback.textContent = solvedSummary;
-          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
         }
       });
 

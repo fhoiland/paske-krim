@@ -3,7 +3,6 @@ import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
 import { advancedCases } from "../data/advancedCases";
 import {
-  agencyNames,
   caseKey,
   caseVersion,
   difficulties,
@@ -23,7 +22,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 ---
 
 <MainLayout title={`Briefing | ${storyTitle}`}>
-  <StoryShell title="Briefing før saken" eyebrow="Saksbrief" kicker="Klargjør saken">
+  <StoryShell title="Briefing før saken" eyebrow="Saksbrief" kicker="Klargjør saken" showImage={false}>
     <Fragment slot="lead">
       <p id="briefing-lead" class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         Før dere går løs på oppgave 1, får dere en kort briefing med nivå og det viktigste
@@ -41,20 +40,10 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             <p id="briefing-humor" class="mt-2 text-sm font-semibold text-orange-900"></p>
           </div>
           <div class="dossier-card">
-            <p class="dossier-label">Saksflyt</p>
+            <p class="dossier-label">Før du starter</p>
             <p class="mt-2 text-sm leading-7 text-stone-700">
-              Først får dere oversikten, så går dere videre gjennom {totalTasks} oppgaver og til slutt en finale.
+              Dere går videre gjennom {totalTasks} oppgaver og til slutt en finale. Les teksten nøye og svar bare på det oppgaven faktisk spør om.
             </p>
-          </div>
-          <div class="dossier-card">
-            <p class="dossier-label">Hvordan lese saken</p>
-            <p class="mt-2 text-sm leading-7 text-stone-700">
-              Personene vises ikke her lenger. På de høye nivåene må navn, feilspor og løsninger leses ut av selve oppgaveteksten.
-            </p>
-          </div>
-          <div class="dossier-card">
-            <p class="dossier-label">Tips fra enheten</p>
-            <p id="briefing-agency" class="mt-2 text-sm leading-7 text-stone-700"></p>
           </div>
         </div>
 
@@ -74,7 +63,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <script
       is:inline
       define:vars={{
-        agencyNames,
         advancedCases,
         basePath,
         caseKey,
@@ -118,8 +106,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       document.getElementById("briefing-lead").textContent = branch.briefingLead;
       document.getElementById("briefing-difficulty").textContent = difficulty.title;
       document.getElementById("briefing-humor").textContent = difficulty.humor;
-      document.getElementById("briefing-agency").textContent =
-        `${agencyNames[difficulty.level % agencyNames.length]} anbefaler: ${branch.briefingTip}`;
 
       document.getElementById("start-first-task")?.addEventListener("click", () => {
         window.location.href = `${basePath}oppgave/1`;
