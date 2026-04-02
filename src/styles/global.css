@@ -5,8 +5,24 @@
 }
 
 @layer components {
+  .hero-card {
+    @apply relative overflow-hidden rounded-[2.2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,244,219,0.94))] p-6 shadow-[0_20px_55px_rgba(48,34,20,0.16)] backdrop-blur sm:p-8;
+  }
+
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    right: -2rem;
+    bottom: -2rem;
+    width: 11rem;
+    height: 11rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(255, 219, 95, 0.7), transparent 68%);
+    opacity: 0.75;
+  }
+
   .panel-card {
-    @apply relative overflow-hidden rounded-[2rem] border border-stone-700/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(249,244,229,0.94))] p-6 shadow-[0_18px_45px_rgba(59,33,20,0.14)] backdrop-blur;
+    @apply relative overflow-hidden rounded-[2rem] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(249,244,229,0.94))] p-6 shadow-[0_18px_45px_rgba(59,33,20,0.14)] backdrop-blur;
   }
 
   .panel-card::after {
@@ -26,12 +42,37 @@
     transform: rotate(18deg);
   }
 
+  .image-stage {
+    @apply relative overflow-hidden rounded-[2.2rem] border border-white/60 bg-white/70 shadow-[0_22px_55px_rgba(48,34,20,0.16)];
+  }
+
+  .comic-burst {
+    @apply absolute left-1/2 top-5 z-10 -translate-x-1/2 rotate-[-6deg] bg-yellow-300 px-6 py-4 text-center font-black uppercase tracking-tight text-stone-950 shadow-[0_10px_25px_rgba(0,0,0,0.18)];
+    clip-path: polygon(0% 38%, 10% 28%, 8% 10%, 22% 16%, 29% 0%, 41% 12%, 53% 3%, 60% 18%, 74% 10%, 76% 26%, 92% 22%, 86% 40%, 100% 49%, 88% 58%, 92% 74%, 76% 72%, 72% 90%, 58% 80%, 48% 100%, 39% 82%, 24% 88%, 22% 72%, 8% 76%, 12% 58%);
+  }
+
+  .image-fade {
+    @apply pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/75 to-transparent;
+  }
+
   .section-pill {
     @apply inline-flex rounded-full border border-orange-200 bg-orange-100/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-900;
   }
 
+  .case-chip {
+    @apply rounded-full border border-orange-200/80 bg-white/75 px-4 py-2 text-sm font-semibold text-orange-900 shadow-sm;
+  }
+
+  .dossier-card {
+    @apply rounded-[1.5rem] border border-stone-700/10 bg-white/72 p-4 shadow-[0_10px_25px_rgba(59,33,20,0.08)];
+  }
+
+  .dossier-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-orange-800;
+  }
+
   .option-btn {
-    @apply w-full rounded-[1.2rem] border border-stone-700/10 bg-white/85 px-4 py-4 text-left text-stone-800 shadow-[0_8px_18px_rgba(59,33,20,0.06)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50;
+    @apply w-full rounded-[1.2rem] border border-stone-700/10 bg-white/88 px-4 py-4 text-left text-stone-800 shadow-[0_8px_18px_rgba(59,33,20,0.06)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50;
   }
 
   .selected-option {
@@ -53,7 +94,7 @@
     radial-gradient(circle at 72% 24%, #fff 0 2px, transparent 3px),
     radial-gradient(circle at 28% 78%, #fff 0 2px, transparent 3px),
     radial-gradient(circle at 84% 68%, #fff 0 2px, transparent 3px),
-    radial-gradient(circle at 56% 48%, rgba(255, 255, 255, 0.8) 0 1px, transparent 3px);
+    radial-gradient(circle at 56% 48%, rgba(255, 255, 255, 0.84) 0 1px, transparent 3px);
   background-size: 240px 240px;
   animation: drift 22s linear infinite;
 }

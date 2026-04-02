@@ -1,135 +1,183 @@
-export type TaskOption = {
-  value: string;
-  label: string;
+export type Suspect = {
+  id: string;
+  name: string;
+  role: string;
+  style: string;
+  clueItem: string;
+  clueDetail: string;
+  alibi: string;
 };
 
-export type Task = {
+export type Motive = {
+  id: string;
+  label: string;
+  clueText: string;
+  revealText: string;
+};
+
+export type HidingSpot = {
+  id: string;
+  label: string;
+  codeWord: string;
+  routeClue: string;
+  revealText: string;
+};
+
+export type TaskMeta = {
   id: number;
   slug: string;
   title: string;
-  shortTitle: string;
   scene: string;
   question: string;
-  prompt: string;
-  story: string[];
-  options: TaskOption[];
-  correctAnswer: string;
-  successText: string;
-  hintText: string;
   nextHref: string;
   nextLabel: string;
 };
 
-export const storyTitle = "Påskekrimmen på hytta på Bru";
-export const progressKey = "bru-hytte-paskekrim";
+export const storyTitle = "Påskekrimmen på Bru";
+export const progressKey = "bru-hytte-paskekrim-progress";
+export const caseKey = "bru-hytte-paskekrim-case";
+export const caseVersion = 2;
 
 export const introText = [
-  "Påskeferien på hytta på Bru skulle være rolig. Snøen lå glitrende over tunet, kakaoen sto klar inne, og kveldens store premie var det sagnomsuste Bru-egget: et gullmalt påskeegg fylt med hemmelige premier.",
-  "Så kom skriket. Utenfor huset spratt Påskeharen fram i full panikk og ropte 'NEEEIIIIII!!' mens en liten grå mus med kaninører raste gjennom snøen med sekken full av fargerike egg.",
-  "Ingen vet hvor Bru-egget ble gjemt. Nå er det deres jobb å følge sporene, løse oppgavene og finne ut hvem som stjal egget, hvor tyven løp, og hvor skatten nå er skjult."
+  "Påskeaften på hytta på Bru skulle bli årets høydepunkt. Premiebordet var pyntet, snøen glitret blått i kveldssola, og alle ventet på avsløringen av det legendariske Bru-egget.",
+  "Så eksploderte hele tunet i kaos. Påskeharen skrek 'NEEEIIIIII!!', en liten mus med kaninører spratt gjennom snøen med sekken full av fargerike egg, og alle stormet ut for å se hva som foregikk.",
+  "Da folk kom inn igjen, var selve Bru-egget borte. Nå trenger hytta på Bru en skarp etterforsker. Hver oppgave gir dere én ny nøkkel til saken, og hver nye runde kan ha en helt annen tyv."
 ];
 
-export const tasks: Task[] = [
+export const suspects: Suspect[] = [
+  {
+    id: "oskar",
+    name: "Oskar Bruvik",
+    role: "naboen i blå parkas",
+    style: "snakker rolig, men følger alltid med på alt som skjer rundt premiebordet",
+    clueItem: "blå skismøring",
+    clueDetail: "et blankt blått merke langs kanten av premiepallen",
+    alibi: "hevdet at han bare sto ved vedstabelen og holdt øye med snøføyka"
+  },
+  {
+    id: "pelle",
+    name: "Pelle Påskehare",
+    role: "den teatralske arrangementsverten",
+    style: "lager store entréer, roper høyt og sprer alltid litt glitter etter seg",
+    clueItem: "gult sceneglitter",
+    clueDetail: "små gule glimt inne i smeltet snø ved den tomme eggsokkelen",
+    alibi: "påsto at han aldri gikk inn igjen etter at han begynte å rope på tunet"
+  },
+  {
+    id: "lovise",
+    name: "Lovise Lyng",
+    role: "påskemaleren med fiolette fingre",
+    style: "ser uskyldig ut, men er ekstremt opptatt av detaljer, premier og hvem som vinner",
+    clueItem: "fiolett eggmaling",
+    clueDetail: "en tynn stripe fiolett maling bak silkeduken på premiebordet",
+    alibi: "insisterte på at hun sto ved kakaoen hele tiden og aldri nærmet seg pokalen"
+  },
+  {
+    id: "milla",
+    name: "Milla Musetind",
+    role: "oppfinneren bak påskemus-showet",
+    style: "smiler lurt, trener små dyr og har alltid med seg rekvisitter i lomma",
+    clueItem: "stripet gulrottråd",
+    clueDetail: "en tynn gulrotfarget tråd hektet fast i kanten av premieduken",
+    alibi: "sa at hun bare jaget musen ute og ikke rakk å komme inn før alle andre"
+  }
+];
+
+export const motives: Motive[] = [
+  {
+    id: "sabotage",
+    label: "å sabotere finalen og nekte andre å vinne",
+    clueText: "Ingen får løfte Bru-egget foran meg i kveld.",
+    revealText: "Alt peker mot et sabotasje-motiv. Tyven ville ødelegge finalen heller enn å se noen andre vinne."
+  },
+  {
+    id: "swap",
+    label: "å bytte ut originalen med en kopi og selge den ekte senere",
+    clueText: "Kopien er pen nok for publikum. Originalen er det bare jeg som trenger.",
+    revealText: "Notatet viser et planlagt bytte. Tyven tenkte mer på gevinst enn på påskestemning."
+  },
+  {
+    id: "spotlight",
+    label: "å bruke egget i et hemmelig nattshow og stjele all oppmerksomheten",
+    clueText: "Når lyset går på ved midnatt, må alle se på meg og ingen andre.",
+    revealText: "Motivet er ren oppmerksomhet. Bru-egget skulle bli hovednummeret i et privat triumfshow."
+  },
+  {
+    id: "ransom",
+    label: "å gjemme egget og kreve en tjeneste for å levere det tilbake",
+    clueText: "Ingen får egget tilbake før min avtale er oppfylt.",
+    revealText: "Tyven ville bruke Bru-egget som pressmiddel og tvinge fram en avtale."
+  }
+];
+
+export const hidingSpots: HidingSpot[] = [
+  {
+    id: "bridge",
+    label: "under brua bak islykten",
+    codeWord: "BRUA",
+    routeClue: "sporene stopper ved den gamle brua, og det drypper gullmaling ned mot bekken",
+    revealText: "Gjemmestedet er under brua. Tyven skjulte egget i skyggen bak islykten."
+  },
+  {
+    id: "woodbox",
+    label: "i vedkassen på verandaen",
+    codeWord: "VEDKASSE",
+    routeClue: "en svak stripe glansstøv og smeltet snø leder rett mot den lune verandaen",
+    revealText: "Egget ligger i vedkassen. Der var det akkurat nok varme til å skjule sporene."
+  },
+  {
+    id: "postbox",
+    label: "i den gamle postkassen ved innkjørselen",
+    codeWord: "POSTKASSE",
+    routeClue: "små snøsprut og et enslig fiolett skjell peker bort mot innkjørselen",
+    revealText: "Tyven brukte den gamle postkassen som skjulested. Ingen tenkte på å lete der først."
+  },
+  {
+    id: "loft",
+    label: "på hemsen over kjøkkenet",
+    codeWord: "HEMS",
+    routeClue: "det knirker over taket, og en gyllen prikk skimtes i støvet over kjøkkendøra",
+    revealText: "Bru-egget er gjemt på hemsen. Tyven valgte høyden for å holde seg ett steg foran alle."
+  }
+];
+
+export const taskMeta: TaskMeta[] = [
   {
     id: 1,
     slug: "1",
-    title: "Oppgave 1: Kaoset på tunet",
-    shortTitle: "Kaoset på tunet",
-    scene: "Ute foran hytta",
-    question: "Hva er det første bildet faktisk avslører?",
-    prompt: "Velg observasjonen som stemmer med det som skjer ute på tunet.",
-    story: [
-      "Dere stormer ut døren og ser sporene i snøen. Den grå musen løper vekk fra huset med en blå sekk proppfull av egg, mens Påskeharen kommer hoppende etter i full fortvilelse.",
-      "Ved veggen står et vitne helt stille, og hunden følger nøye med. Men bare én av observasjonene forklarer hva som faktisk skjer akkurat nå."
-    ],
-    options: [
-      {
-        value: "mouse",
-        label: "Musen flykter fra hytta med sekken full av egg, mens haren prøver å stoppe den"
-      },
-      {
-        value: "hare",
-        label: "Påskeharen løper fra musen fordi haren selv ble tatt på fersken"
-      },
-      {
-        value: "dog",
-        label: "Hunden er den som bærer skatten, og de andre løper bare etter"
-      }
-    ],
-    correctAnswer: "mouse",
-    successText:
-      "Riktig. Tyven er på flukt, og det er musen som har kontroll på eggsekken. Nå må dere finne ut hvor den planla å løpe.",
-    hintText:
-      "Se på hvem som faktisk bærer sekken, og hvem som ser ut til å rope i fortvilelse.",
+    title: "Oppgave 1: Avledningen",
+    scene: "Tunet foran hytta",
+    question: "Hva avslører egentlig bildet og kaoset på tunet?",
     nextHref: "/oppgave/2",
-    nextLabel: "Gå til oppgave 2"
+    nextLabel: "Videre til oppgave 2"
   },
   {
     id: 2,
     slug: "2",
-    title: "Oppgave 2: Lappen ved trappen",
-    shortTitle: "Lappen ved trappen",
-    scene: "Ved inngangsdøren",
-    question: "Hvor skulle musen videre?",
-    prompt: "Lappen er skrevet med ett hakk forskyvning framover i alfabetet. Hvor peker den?",
-    story: [
-      "På den nederste trappen finner dere en våt lapp som må ha falt ut av sekken i farten. På lappen står det bare: CSVB.",
-      "Under bokstavene er det tegnet en enkel strek over en bekk. Ingrid fra nabohytta hvisker at musetyven sikkert har skrevet kodet for å forvirre dere."
-    ],
-    options: [
-      { value: "skogen", label: "Skogen" },
-      { value: "brua", label: "Brua" },
-      { value: "boden", label: "Skiboden" }
-    ],
-    correctAnswer: "brua",
-    successText:
-      "Ja. Når bokstavene flyttes ett hakk tilbake, blir CSVB til BRUA. Tyven planla å rømme over eller under brua ved hytta på Bru.",
-    hintText:
-      "Flytt hver bokstav ett steg bakover i alfabetet: C blir B, S blir R ...",
+    title: "Oppgave 2: Sporrommet",
+    scene: "Premiebordet inne i hytta",
+    question: "Hvem peker sporene mot denne gangen?",
     nextHref: "/oppgave/3",
-    nextLabel: "Følg sporene til oppgave 3"
+    nextLabel: "Videre til oppgave 3"
   },
   {
     id: 3,
     slug: "3",
-    title: "Oppgave 3: Sporene ved brua",
-    shortTitle: "Sporene ved brua",
-    scene: "Ved bekken og brua",
-    question: "Hvor er Bru-egget gjemt?",
-    prompt: "Dere finner tre tydelige spor ved brua. Hva er den beste konklusjonen?",
-    story: [
-      "Ved den gamle trebrua ser dere at hundesporene stopper oppe på stien ved eieren. Haresporene vender tilbake mot tunet, som om haren snudde for å rope på hjelp.",
-      "Bare de små musesporene fortsetter ned mot skyggen under brua. Der ligger det også litt gullfarget maling i snøen og et lilla eggeskall som har hektet seg fast i plankene."
-    ],
-    options: [
-      { value: "under-brua", label: "Bru-egget er gjemt under brua, bak plankene ved bekken" },
-      { value: "hundebag", label: "Bru-egget ligger i baggen til mannen ved huset" },
-      { value: "hareluke", label: "Bru-egget er gjemt i en hemmelig hareluke ved terrassen" }
-    ],
-    correctAnswer: "under-brua",
-    successText:
-      "Riktig. Alle sporene samler seg under brua. Nå gjenstår bare den endelige avsløringen av tyv, vitne og gjemmested.",
-    hintText:
-      "Hvem sine spor fortsetter helt ned til bekken, og hvor dukker den gullfargede malingen opp?",
+    title: "Oppgave 3: Kodelappen",
+    scene: "Mellom verandaen og bekken",
+    question: "Hvor ble Bru-egget gjemt?",
+    nextHref: "/oppgave/4",
+    nextLabel: "Videre til oppgave 4"
+  },
+  {
+    id: 4,
+    slug: "4",
+    title: "Oppgave 4: Brennmerket brev",
+    scene: "Ved peisen",
+    question: "Hva var tyvens egentlige motiv?",
     nextHref: "/finale",
     nextLabel: "Gå til finalen"
   }
 ];
 
-export const finalChoices = {
-  culprit: [
-    { value: "musa", label: "Den grå påskemusa med kaninører" },
-    { value: "haren", label: "Påskeharen" },
-    { value: "mannen", label: "Mannen ved veggen" }
-  ],
-  witness: [
-    { value: "haren", label: "Påskeharen ropte 'NEEEIIIIII!!'" },
-    { value: "hunden", label: "Hunden ropte da egget forsvant" },
-    { value: "musa", label: "Musen ropte for å lure alle" }
-  ],
-  hiding: [
-    { value: "under-brua", label: "Under brua ved bekken" },
-    { value: "inne", label: "Inne på kjøkkenet" },
-    { value: "sekken", label: "Fortsatt i sekken på tunet" }
-  ]
-};
+export const totalTasks = taskMeta.length;

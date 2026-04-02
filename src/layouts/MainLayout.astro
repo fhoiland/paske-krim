@@ -5,7 +5,10 @@ interface Props {
   title?: string;
 }
 
-const { title = "Påskekrimmen på hytta på Bru" } = Astro.props;
+const { title = "Påskekrimmen på Bru" } = Astro.props;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <!doctype html>
@@ -16,15 +19,17 @@ const { title = "Påskekrimmen på hytta på Bru" } = Astro.props;
     <title>{title}</title>
     <meta
       name="description"
-      content="Interaktiv påskekrim ved hytta på Bru bygget med Astro og Tailwind CSS."
+      content="Interaktiv og tilfeldig påskekrim ved hytta på Bru bygget med Astro og Tailwind CSS."
     />
   </head>
-  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.82),transparent_28%),linear-gradient(180deg,#9dc1ff_0%,#d9e8ff_18%,#eef4ff_30%,#fff5bf_56%,#efcc72_100%)] text-stone-900">
+  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.86),transparent_24%),linear-gradient(180deg,#7cb0ff_0%,#d7e7ff_18%,#f4f8ff_30%,#fff4ae_58%,#efc86f_100%)] text-stone-900">
     <div class="pointer-events-none fixed inset-0 overflow-hidden">
-      <div class="absolute -left-20 top-24 h-64 w-64 rounded-full bg-pink-200/60 blur-3xl"></div>
-      <div class="absolute -right-24 bottom-20 h-72 w-72 rounded-full bg-lime-100/70 blur-3xl"></div>
-      <div class="snow-layer absolute inset-0 opacity-50"></div>
+      <div class="absolute left-[-6rem] top-24 h-72 w-72 rounded-full bg-pink-200/60 blur-3xl"></div>
+      <div class="absolute right-[-5rem] bottom-20 h-80 w-80 rounded-full bg-yellow-100/70 blur-3xl"></div>
+      <div class="absolute right-1/4 top-0 h-56 w-56 rounded-full bg-sky-100/80 blur-3xl"></div>
+      <div class="snow-layer absolute inset-0 opacity-55"></div>
     </div>
+    <script src={`${basePath}case-runtime.js`}></script>
     <slot />
   </body>
 </html>
