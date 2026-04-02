@@ -437,13 +437,13 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       addParagraphs(
         difficulty.level === 5
           ? [
-              "Ekspertnivået bruker en komprimert saksvegg i stedet for lang forklaring. Her må dere lese motsetningene raskt og finne hvem som faktisk ikke kan være der de sier."
+              "Ekspertnivået bruker en komprimert saksvegg i stedet for lang forklaring. Her må dere lese motsetningene raskt og finne hvem som faktisk ikke kan være der de sier, samtidig som halve hytta prøver å late som den pinlige badstuerunden aldri skjedde."
             ]
           : [
               `På notatveggen står tidslinjen slik: 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.`,
               `Én forklaring sprekker når dere legger den oppå klokkeslett, varme ved peisen og stedet sporet ble funnet. ${culprit.name} sier: ${culprit.contradiction}.`,
               difficulty.level >= 4
-                ? "Her holder det ikke å kjenne igjen et spor. Dere må se hvem som hevder å være ute, inne eller et helt annet sted på feil tidspunkt."
+                ? "Her holder det ikke å kjenne igjen et spor. Dere må se hvem som hevder å være ute, inne eller et helt annet sted på feil tidspunkt, og hvem som prøver å kamuflere klønete voksenoppførsel som uskyldig hyttestemning."
                 : "Ett navn passer dårlig med tidslinjen."
             ]
       );
@@ -463,7 +463,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
                 )
                 .join("")}
             </div>
-            <p class="mt-4"><strong>Regel:</strong> Den skyldige må ha vært nær peisen rundt 18.09 og samtidig ha levert en forklaring som ikke tåler tidslinjen.</p>
+            <p class="mt-4"><strong>Regel:</strong> Den skyldige må ha vært nær peisen rundt 18.09 og samtidig ha levert en forklaring som ikke tåler tidslinjen, badstuekaoset eller den kollektive skammen morgenen etter.</p>
           `
           : `<p><strong>Regel:</strong> Den skyldige må ha hatt tid til å utnytte avledningen, være nær premiestativet og samtidig levere et alibi som ikke tåler klokkeslett.</p>`
       );
@@ -502,12 +502,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       addParagraphs(
         difficulty.level === 5
           ? [
-              "Nå er dere i ren kodeknekkermodus. Dere får ikke motivet servert som setning. Dere må utlede selve motivkoden fra komprimerte spor."
+              "Nå er dere i ren kodeknekkermodus. Dere får ikke motivet servert som setning. Dere må utlede selve motivkoden fra komprimerte spor, småfrekke kommentarer og et kveldsopplegg som tydelig skled fra påskekos til voksen katastrofekomedie."
             ]
           : [
               `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med ordet ${phraseHint}, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
               difficulty.level >= 4
-                ? "Dette er ikke lenger bare en motivoppgave. Dere må lese språk, tone og plan som ett mønster. Kodeordet dere finner skal peke direkte mot hvorfor tyven gjorde dette."
+                ? "Dette er ikke lenger bare en motivoppgave. Dere må lese språk, tone og plan som ett mønster. Kodeordet dere finner skal peke direkte mot hvorfor tyven gjorde dette, og hvorfor flere voksne nå er desperate etter at ingen nevner hva som skjedde mellom badstua og stua."
                 : "Når dere legger brevlappen og avhørsglippene ved siden av hverandre, peker alt mot ett motiv."
             ]
       );
