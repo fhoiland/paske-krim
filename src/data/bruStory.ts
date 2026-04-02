@@ -78,13 +78,13 @@ export const storyBranches = {
   adult: {
     intro: [
       "På de høyeste nivåene starter saken senere på kvelden. Etter den offisielle avdukingen fortsatte hytteturen med badstue, karaoke, bobler i plastglass og en kollektiv beslutning om at 'ingen trengte egentlig full oversikt'.",
-      "Så kom det andre kaoset: en hare i full panikk på tunet, en mus i kaninører, et altfor teatralsk nødskrik og flere voksne som plutselig hadde fryktelig dårlig kontroll på både tidslinje, morgenkåper og hvor de sist la nøklene sine.",
-      "Da roen senket seg, var Bru-egget borte igjen. Denne gangen skjuler løsningen seg ikke i ett bilde, men i korte tekster, skjeve formuleringer, krypterte spor og pinlige småglipper som nesten alle håper dere overser."
+      "Så kom det andre kaoset: en hare i full panikk på tunet, en mus i kaninører, et altfor teatralsk nødskrik og flere voksne som plutselig hadde fryktelig dårlig kontroll på både tidslinje, morgenkåper, sexleketøy i feil bag og hvor de sist la nøklene sine.",
+      "Da roen senket seg, var Bru-egget borte igjen. Kripos avdeling Bru noterte raskt at sexleketøy i vedkurven, et håndkle på lampen og en badstueøse i postkassen var pinlige sidespor, men ikke selve løsningen. Denne gangen skjuler svaret seg i korte tekster, skjeve formuleringer, krypterte spor og småglipper som nesten alle håper dere overser."
     ],
     briefingLead:
       "Dette er nattversjonen av Bru-saken: samme hytte, samme egg og samme grunnkaos, men med mer voksenhytteskam, dårligere bortforklaringer og langt skarpere kodeoppgaver.",
     briefingTip:
-      "På nivå 4 og 5 ligger svaret ofte gjemt i selve teksten. Se etter forbokstaver, mønstre, kodeord og setninger som virker litt for bevisst formulert."
+      "På nivå 4 og 5 ligger svaret ofte gjemt i selve teksten. Se etter forbokstaver, mønstre, kodeord og setninger som virker litt for bevisst formulert, og ikke la sexleketøy i feil rom distrahere dere fra faktisk bevis."
   }
 } as const;
 
@@ -243,34 +243,34 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "tove",
       name: "Tove",
       role: "den metodiske løypeføreren",
-      style: "noterer alt i små blokker og ser ut som hun kunne ledet både en redningsaksjon og et meget dømmende nachspiel i samme morgenkåpe",
+      style: "noterer alt i små blokker og ser ut som hun kunne ledet både en redningsaksjon og et meget dømmende nachspiel i samme morgenkåpe, selv når sexleketøy plutselig dukker opp i feil turutstyr",
       clueItem: "røde skivoksspor",
       clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
-      alibi: "hevdet at hun bare målte snødybde ved brua og absolutt ikke hadde noe med den halvåpne badstuedøra å gjøre",
+      alibi: "hevdet at hun bare målte snødybde ved brua og absolutt ikke hadde noe med den halvåpne badstuedøra eller sexleketøyet i skismøringsbagen å gjøre",
       contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
-      interviewTell: "siterer klokkeslett med samme energi som folk flest bruker når de lyver om hvor klærne deres ble av"
+      interviewTell: "siterer klokkeslett med samme energi som folk flest bruker når de lyver om hvor klærne deres ble av og hvorfor sexleketøy plutselig ligger ved tørkevottene"
     },
     {
       id: "siw",
       name: "Siw",
       role: "den elegante premiebordansvarlige",
-      style: "retter på duker med iskald ro og ser ut som hun kunne avslutte både en diskusjon og en flørt med ett eneste hevet øyenbryn",
+      style: "retter på duker med iskald ro og ser ut som hun kunne avslutte både en diskusjon og en garderobekrise med ett eneste hevet øyenbryn",
       clueItem: "glitterstøv",
       clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
-      alibi: "sa at hun var i gangen og beroliget haren hele tiden, og definitivt ikke drev med dramatisk garderobekrise",
+      alibi: "sa at hun var i gangen og beroliget haren hele tiden, og definitivt ikke drev med dramatisk garderobekrise eller leting etter sexleketøy i feil toalettmappe",
       contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
-      interviewTell: "sukker før hvert svar som om hele avhøret forstyrrer en mye viktigere garderobekrise"
+      interviewTell: "sukker før hvert svar som om hele avhøret forstyrrer en mye viktigere garderobekrise og en langt mer pinlig gjenstandsinventering"
     },
     {
       id: "therese",
       name: "Therese",
       role: "den teatralske dekorbyggeren",
-      style: "snakker i store bilder og oppfører seg som om livet er et sceneshow der spotlys, champagne og strategisk bare skuldre er en menneskerett",
+      style: "snakker i store bilder og oppfører seg som om livet er et sceneshow der spotlys, champagne og strategisk dårlig pakkedisiplin er en menneskerett",
       clueItem: "fiolett tape",
       clueDetail: "en tynn stripe fiolett tape bak duken",
-      alibi: "påsto at hun testet lysslyngene ute på verandaen og bare tilfeldigvis manglet den ene paljettjakken sin",
+      alibi: "påsto at hun testet lysslyngene ute på verandaen og bare tilfeldigvis manglet den ene paljettjakken sin og en diskret sexleketøypose ingen ville vedkjenne seg",
       contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
-      interviewTell: "svarer med tre detaljer, to sidespor og én unødvendig sensuell forklaring når ett ord hadde holdt"
+      interviewTell: "svarer med tre detaljer, to sidespor og én fullstendig unødvendig forklaring på hvorfor sexleketøy ikke burde telle som teknisk utstyr"
     },
     {
       id: "inge",
@@ -287,23 +287,23 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "jan",
       name: "Jan",
       role: "den joviale grillmesteren uten grill",
-      style: "ler høyt, tar plass og har den sjeldne evnen til å få bar overkropp, dårlig timing og enorm selvtillit til å høres ut som et forsvar",
+      style: "ler høyt, tar plass og har den sjeldne evnen til å få dårlig timing, et løst håndkle og sexleketøy i feil kjølebag til å høres ut som et forsvar",
       clueItem: "røykstøv",
       clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
       alibi: "insisterte på at han bare sto på tunet og fortalte lange historier, til tross for at halve hytta husker et meget unødvendig badstue-innslag",
       contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
-      interviewTell: "skifter tema til pølser, puls eller badstue så snart noen nærmer seg sannheten"
+      interviewTell: "skifter tema til pølser, puls, badstue eller sexleketøy i feil kjøleboks så snart noen nærmer seg sannheten"
     },
     {
       id: "fredrik",
       name: "Fredrik",
       role: "den tekniske dørvokteren",
-      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvorfor buksa hans tilsynelatende tok en egen liten rundtur i hytta",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvorfor buksa hans tilsynelatende tok en egen liten rundtur i hytta og hvorfor sexleketøy plutselig lå i verktøykassa",
       clueItem: "kobberstøv",
       clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
-      alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget, selv om flere vitner nevner en pinlig sprint etter et bortkommet håndkle",
+      alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget, selv om flere vitner nevner en pinlig sprint etter et bortkommet håndkle og en svært feilplassert sexleketøylader",
       contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
-      interviewTell: "bruker uttrykket 'teknisk sett' med den desperate tryggheten til en mann som håper semantikk skal redde både ære og håndkle"
+      interviewTell: "bruker uttrykket 'teknisk sett' med den desperate tryggheten til en mann som håper semantikk skal redde både ære, håndkle og sexleketøylogistikk"
     }
   ],
   kodeknekker: [
@@ -311,34 +311,34 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "tove",
       name: "Tove",
       role: "den metodiske løypeføreren",
-      style: "noterer alt i små blokker og har den kjølige roen til en person som allerede har sett alt, inkludert nok voksenhytteskam til å skrive bok om det",
+      style: "noterer alt i små blokker og har den kjølige roen til en person som allerede har sett alt, inkludert nok voksenhytteskam og sexleketøy på avveie til å skrive bok om det",
       clueItem: "røde skivoksspor",
       clueDetail: "et tynt rødt merke langs kanten av den tomme sokkelen",
-      alibi: "hevdet at hun bare målte snødybde ved brua og aldri gikk inn",
+      alibi: "hevdet at hun bare målte snødybde ved brua og aldri gikk inn, til tross for at noen også fant sexleketøy i den feilaktig 'veldig faglige' utstyrsbagen hennes",
       contradiction: "påstår hun sto ute ved brua, men voksen og tørr skivoks hører til inne ved peisen",
-      interviewTell: "siterer klokkeslett som om hun prøver å vinne NM i passiv-aggressiv etterpåklokskap"
+      interviewTell: "siterer klokkeslett som om hun prøver å vinne NM i passiv-aggressiv etterpåklokskap og samtidig late som sexleketøyet i vottekurven er en bagatell"
     },
     {
       id: "siw",
       name: "Siw",
       role: "den elegante premiebordansvarlige",
-      style: "retter på duker med kongelig forakt og får hele rommet til å føle seg underkledd, undertent og litt skyldig",
+      style: "retter på duker med kongelig forakt og får hele rommet til å føle seg underkledd, undertent og litt skyldig, særlig når sexleketøy dukker opp i linserviettene",
       clueItem: "glitterstøv",
       clueDetail: "gullglitter som drysser i en presis bue ved premiebordet",
-      alibi: "sa at hun var i gangen og beroliget haren hele tiden",
+      alibi: "sa at hun var i gangen og beroliget haren hele tiden, og definitivt ikke drev med logistikk rundt sexleketøy som på mystisk vis hadde havnet i velkomstkurven",
       contradiction: "hevder hun aldri rørte bordet, men glitteret hennes danner en halvsirkel der noen lente seg inn",
-      interviewTell: "sukker før hvert svar som om hele rommet burde skamme seg for å ha avbrutt hennes dramatiske entré"
+      interviewTell: "sukker før hvert svar som om hele rommet burde skamme seg for å ha avbrutt hennes dramatiske entré og den langt pinligere oppryddingen etterpå"
     },
     {
       id: "therese",
       name: "Therese",
       role: "den teatralske dekorbyggeren",
-      style: "snakker i store bilder og bærer seg som om enhver samtale bør ha myk belysning, applaus og minst én uplanlagt avkledning",
+      style: "snakker i store bilder og bærer seg som om enhver samtale bør ha myk belysning, applaus og minst én uplanlagt sexleketøyskandale i feil rom",
       clueItem: "fiolett tape",
       clueDetail: "en tynn stripe fiolett tape bak duken",
-      alibi: "påsto at hun testet lysslyngene ute på verandaen",
+      alibi: "påsto at hun testet lysslyngene ute på verandaen, og at sexleketøyet i pyntekurven åpenbart måtte være en kunstnerisk misforståelse",
       contradiction: "sier at tapen hennes var ute ved verandaen, men den samme typen sitter under premieduken",
-      interviewTell: "leverer hvert svar som en liten erotisk thriller ingen egentlig ba om"
+      interviewTell: "leverer hvert svar som et lite voksent monolognummer ingen egentlig ba om, særlig ikke delen om sexleketøy som rekvisitt"
     },
     {
       id: "inge",
@@ -355,23 +355,23 @@ export const suspectRosters: Record<string, Suspect[]> = {
       id: "jan",
       name: "Jan",
       role: "den joviale grillmesteren uten grill",
-      style: "ler høyt, tar plass og oppfører seg som om sjarm, damp og delvis påkledning er juridisk bindende dokumentasjon",
+      style: "ler høyt, tar plass og oppfører seg som om sjarm, damp, løse tøfler og sexleketøy i feil kjølebag er juridisk bindende dokumentasjon",
       clueItem: "røykstøv",
       clueDetail: "en luktstripe av røykstøv i retning peisen og bordet",
       alibi: "insisterte på at han bare sto på tunet og fortalte lange historier",
       contradiction: "hevder han var ute, men røykstøvet fra jakken hans er ferskest inne ved peisen",
-      interviewTell: "skifter tema til pølser, pupper, puls eller badstue i ren overlevelsespanel"
+      interviewTell: "skifter tema til pølser, puls, sexleketøy i feil kjøleboks eller badstue i ren overlevelsespanel"
     },
     {
       id: "fredrik",
       name: "Fredrik",
       role: "den tekniske dørvokteren",
-      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvordan én nøkkel, ett håndkle og null selvinnsikt kan ødelegge en hel påskeaften",
+      style: "kan åpne alt, fikse alt og forklare alt litt for selvsikkert, inkludert hvordan én nøkkel, ett håndkle, en bortkommen sexleketøylader og null selvinnsikt kan ødelegge en hel påskeaften",
       clueItem: "kobberstøv",
       clueDetail: "små kobberfargede prikker ved låsen på premiestativet",
       alibi: "sa at han bare justerte en dørlist i gangen og aldri kom nær egget",
       contradiction: "hevder han jobbet i gangen, men kobberstøvet ligger ved låsen der egget sto",
-      interviewTell: "bruker ordet 'teknisk sett' så ofte at hele hytta lukter ansvarsfraskrivelse og varm furupanel"
+      interviewTell: "bruker ordet 'teknisk sett' så ofte at hele hytta lukter ansvarsfraskrivelse, varm furupanel og diskusjon om hvorfor sexleketøy ikke hører hjemme i verktøykassa"
     }
   ]
 };
