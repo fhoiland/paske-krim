@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
+import { advancedCases } from "../data/advancedCases";
 import {
   agencyNames,
   caseKey,
@@ -72,6 +73,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       is:inline
       define:vars={{
         agencyNames,
+        advancedCases,
         basePath,
         caseKey,
         caseVersion,
@@ -92,6 +94,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const caseData = {
         caseKey,
         caseVersion,
+        advancedCases,
         difficulties,
         hidingSpots,
         motives,

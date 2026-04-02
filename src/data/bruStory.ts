@@ -51,7 +51,7 @@ export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
 export const statsKey = "bru-hytte-paskekrim-stats";
-export const caseVersion = 6;
+export const caseVersion = 7;
 
 export const agencyNames = [
   "Bruagentene",
@@ -61,7 +61,7 @@ export const agencyNames = [
   "Operasjon Gulrotblink"
 ];
 
-export const versionBadge = "v6.1.1 | Nå med mindre sexleketøyspam, mer nakenpanikk og nok voksenhytteskam til å varme hele Bru";
+export const versionBadge = "v7.0.0 | Nå med mørkere casebook, falske spor og nok logisk friksjon til å gi Bruagentene hodepine";
 
 export const storyBranches = {
   family: {

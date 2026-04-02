@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
+import { advancedCases } from "../data/advancedCases";
 import {
   agencyNames,
   caseKey,
@@ -23,7 +24,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 <MainLayout title="Finale | Påskekrimmen på Bru">
   <StoryShell title="Finalen: Hvem tok Bru-egget?" eyebrow="Siste side" kicker="Lukk saken">
     <Fragment slot="lead">
-      <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
+      <p id="final-lead-copy" class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         Nå må dere samle alt: avledningen, sportsbeviset, kodelappen, tidslinjebruddet og kryssforhøret. Når alle tre
         sluttvalg er riktige, får dere hele avsløringen og kan sende rapporten tilbake til Bruagentene.
       </p>
@@ -55,10 +56,19 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
               ))}
             </div>
           </section>
+
+          <section id="final-evidence-shell" class="hidden">
+            <p class="font-semibold text-stone-700">4. Hvilke tre bevis bærer anklagen?</p>
+            <p id="final-evidence-rule" class="mt-2 text-sm leading-7 text-stone-600"></p>
+            <div id="final-evidence-options" class="mt-3 grid gap-3"></div>
+          </section>
         </div>
 
         <button class="submit-btn mt-6" id="solve-finale" type="button">Avslør tyven</button>
         <p class="mt-4 min-h-6 font-semibold" id="final-feedback"></p>
+        <div class="reveal-box mt-5 hidden" id="final-analysis">
+          <p id="final-analysis-copy"></p>
+        </div>
 
         <div class="reveal-box mt-5 hidden" id="final-success">
           <p id="final-reveal-copy"></p>
@@ -92,6 +102,10 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         <span class="section-pill">Sammendrag</span>
         <div class="mt-5 space-y-4 leading-8 text-stone-700">
           <p id="final-agency-copy"></p>
+          <div id="final-case-brief" class="hidden dossier-card">
+            <p class="dossier-label">Casebrief</p>
+            <p id="final-case-brief-copy" class="mt-2 text-sm leading-7 text-stone-700"></p>
+          </div>
           <p>
             Når dere starter på nytt, nullstilles saken skikkelig. Ingen gamle spor, ingen hengende lokal
             state og ingen gjenbruk av forrige finale som later som den fortsatt er aktuell.
@@ -117,6 +131,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       is:inline
       define:vars={{
         agencyNames,
+        advancedCases,
         basePath,
         caseKey,
         caseVersion,
@@ -138,6 +153,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const caseData = {
         caseKey,
         caseVersion,
+        advancedCases,
         difficulties,
         hidingSpots,
         motives,
@@ -149,39 +165,97 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const caseFile = runtime.ensureCase(caseData);
       const progress = runtime.readProgress(progressKey);
 
-      if ((progress.completed?.length || 0) < totalTasks) {
-        window.location.href = `${basePath}oppgave/${(progress.completed?.length || 0) + 1}`;
-      }
-
       const culprit = runtime.findById(suspects, caseFile.culpritId);
       const motive = runtime.findById(motives, caseFile.motiveId);
       const hidingSpot = runtime.findById(hidingSpots, caseFile.hidingSpotId);
       const difficulty = difficulties.find((item) => item.id === caseFile.difficultyId) || defaultDifficulty;
+      const advancedCase =
+        difficulty.level >= 4 ? advancedCases.find((item) => item.id === caseFile.advancedCaseId) || null : null;
+
+      if (advancedCase) {
+        if (!(progress.completed || []).includes(1)) {
+          window.location.href = `${basePath}oppgave/1`;
+        }
+
+        const missingRoutes = [2, 3, 4].filter((id) => !(progress.completed || []).includes(id));
+        if (missingRoutes.length) {
+          window.location.href = `${basePath}oppgave/${missingRoutes[0]}`;
+        }
+
+        if (!(progress.completed || []).includes(5)) {
+          window.location.href = `${basePath}oppgave/5`;
+        }
+      } else if ((progress.completed?.length || 0) < totalTasks) {
+        window.location.href = `${basePath}oppgave/${(progress.completed?.length || 0) + 1}`;
+      }
       const feedback = document.getElementById("final-feedback");
+      const leadCopy = document.getElementById("final-lead-copy");
+      const analysisBox = document.getElementById("final-analysis");
+      const analysisCopy = document.getElementById("final-analysis-copy");
       const revealBox = document.getElementById("final-success");
       const revealCopy = document.getElementById("final-reveal-copy");
       const agencyCopy = document.getElementById("final-agency-copy");
+      const caseBrief = document.getElementById("final-case-brief");
+      const caseBriefCopy = document.getElementById("final-case-brief-copy");
       const difficultyCopy = document.getElementById("final-difficulty-copy");
       const timeCopy = document.getElementById("final-time-copy");
       const bestCopy = document.getElementById("final-best-copy");
       const shareButton = document.getElementById("share-report");
       const culpritOptions = document.getElementById("final-culprit-options");
-      const state = { culprit: "", motive: "", hiding: "" };
+      const evidenceShell = document.getElementById("final-evidence-shell");
+      const evidenceRule = document.getElementById("final-evidence-rule");
+      const evidenceOptions = document.getElementById("final-evidence-options");
+      const solveButton = document.getElementById("solve-finale");
+      const state = { culprit: "", motive: "", hiding: "", evidence: [] };
       let solvedSummary = "";
       let solvedOnce = false;
 
-      agencyCopy.textContent =
-        `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} er klare til å arkivere saken, men bare hvis rapporten deres ikke lukter ren gjetting.`;
-      difficultyCopy.textContent = `${difficulty.title} | ${difficulty.humor}`;
+      agencyCopy.textContent = advancedCase
+        ? `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} vil ha en stram anklage, ikke en dramatisk magefølelse.`
+        : `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} er klare til å arkivere saken, men bare hvis rapporten deres ikke lukter ren gjetting.`;
+      difficultyCopy.textContent = advancedCase
+        ? `${difficulty.title} | ${advancedCase.tagline}`
+        : `${difficulty.title} | ${difficulty.humor}`;
       timeCopy.textContent = runtime.formatDuration(runtime.elapsedMs(caseFile));
       const currentBest = runtime.readStats(statsKey).bestTimes?.[difficulty.id];
       bestCopy.textContent = currentBest
         ? `Beste tid på dette nivået: ${runtime.formatDuration(currentBest)}`
         : "Ingen registrert rekord på dette nivået ennå.";
 
+      if (advancedCase) {
+        leadCopy.textContent =
+          "Nå må dere bygge en faktisk anklage. Velg skyldig, motiv, skjulested og tre bevis som både knuser feilsporet og binder riktig person til handlingen.";
+        solveButton.textContent = "Lever anklage";
+        evidenceShell.classList.remove("hidden");
+        evidenceRule.textContent = advancedCase.final.evidenceRule;
+        caseBrief.classList.remove("hidden");
+        caseBriefCopy.textContent = advancedCase.final.brief;
+      }
+
       culpritOptions.innerHTML = suspects
         .map((suspect) => `<button class="option-btn" data-option="${suspect.id}" type="button">${suspect.name}</button>`)
         .join("");
+
+      if (advancedCase && evidenceOptions) {
+        evidenceOptions.innerHTML = advancedCase.evidence
+          .map(
+            (item) => `
+              <button class="evidence-pick evidence-pick-${item.tone}" data-evidence="${item.id}" type="button">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Bevis ${item.scene}</p>
+                    <p class="mt-1 font-serif text-2xl text-stone-900">${item.title}</p>
+                  </div>
+                  <span class="evidence-tone evidence-tone-${item.tone}">${
+                    item.tone === "ambiguous" ? "Kan mistolkes" : item.tone === "decisive" ? "Avgjørende" : "Støttende"
+                  }</span>
+                </div>
+                <p class="mt-3 text-sm leading-6 text-stone-700">${item.detail}</p>
+              </button>
+            `
+          )
+          .join("");
+      }
 
       function rankLabel(ms, level) {
         const seconds = Math.floor(ms / 1000);
@@ -202,14 +276,62 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         });
       });
 
+      evidenceOptions?.querySelectorAll("[data-evidence]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const evidenceId = button.dataset.evidence;
+          if (!evidenceId) return;
+
+          if (state.evidence.includes(evidenceId)) {
+            state.evidence = state.evidence.filter((item) => item !== evidenceId);
+          } else if (state.evidence.length < 3) {
+            state.evidence = [...state.evidence, evidenceId];
+          } else {
+            state.evidence = [...state.evidence.slice(1), evidenceId];
+          }
+
+          evidenceOptions.querySelectorAll("[data-evidence]").forEach((item) => {
+            item.classList.toggle("selected-option", state.evidence.includes(item.dataset.evidence));
+          });
+        });
+      });
+
       document.getElementById("solve-finale")?.addEventListener("click", () => {
-        if (!state.culprit || !state.motive || !state.hiding) {
-          feedback.textContent = "Du må velge ett svar i alle tre feltene.";
+        const missingEvidence = advancedCase && state.evidence.length !== 3;
+
+        if (!state.culprit || !state.motive || !state.hiding || missingEvidence) {
+          feedback.textContent = advancedCase
+            ? "Du må velge skyldig, motiv, skjulested og nøyaktig tre bevis."
+            : "Du må velge ett svar i alle tre feltene.";
           feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
           return;
         }
 
-        if (state.culprit === culprit.id && state.motive === motive.id && state.hiding === hidingSpot.id) {
+        if (
+          advancedCase &&
+          state.culprit === culprit.id &&
+          state.motive === motive.id &&
+          state.hiding === hidingSpot.id &&
+          advancedCase.decisiveEvidenceIds.every((id) => state.evidence.includes(id))
+        ) {
+          const elapsed = runtime.elapsedMs(caseFile);
+          const result = runtime.recordBestTime(statsKey, difficulty.id, elapsed);
+          const rank = rankLabel(elapsed, difficulty.level);
+          solvedSummary =
+            `Sak Bru-${caseFile.caseNumber} løst på ${runtime.formatDuration(elapsed)}. Rang: ${rank}. ` +
+            `Tyv: ${culprit.name}. Motiv: ${motive.label}. Gjemmested: ${hidingSpot.label}.`;
+          solvedOnce = true;
+          timeCopy.textContent = runtime.formatDuration(elapsed);
+          feedback.textContent = "Anklagen holder.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
+          analysisBox.classList.add("hidden");
+          revealCopy.textContent =
+            `${advancedCase.final.success} Rang oppnådd: ${rank}. ${result.isRecord ? "Ny rekord på dette nivået." : `Beste tid står fortsatt på ${runtime.formatDuration(result.best)}.`}`;
+          bestCopy.textContent = `Beste tid på dette nivået: ${runtime.formatDuration(result.best)}`;
+          revealBox.classList.remove("hidden");
+          return;
+        }
+
+        if (!advancedCase && state.culprit === culprit.id && state.motive === motive.id && state.hiding === hidingSpot.id) {
           const elapsed = runtime.elapsedMs(caseFile);
           const result = runtime.recordBestTime(statsKey, difficulty.id, elapsed);
           const rank = rankLabel(elapsed, difficulty.level);
@@ -225,8 +347,33 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           bestCopy.textContent = `Beste tid på dette nivået: ${runtime.formatDuration(result.best)}`;
           revealBox.classList.remove("hidden");
         } else {
-          feedback.textContent = "Nesten. Les gjennom sporene igjen og prøv en ny kombinasjon.";
-          feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+          if (advancedCase) {
+            let outcome = advancedCase.final.wrongSuspectOutcome;
+
+            if (state.culprit !== culprit.id && state.culprit === advancedCase.falseLeadId) {
+              outcome = advancedCase.final.falseLeadOutcome;
+            } else if (state.culprit === culprit.id && state.motive !== motive.id) {
+              outcome = advancedCase.final.wrongMotiveOutcome;
+            } else if (state.culprit === culprit.id && state.motive === motive.id && state.hiding !== hidingSpot.id) {
+              outcome = advancedCase.final.wrongHidingOutcome;
+            } else if (
+              state.culprit === culprit.id &&
+              state.motive === motive.id &&
+              state.hiding === hidingSpot.id &&
+              !advancedCase.decisiveEvidenceIds.every((id) => state.evidence.includes(id))
+            ) {
+              outcome = advancedCase.final.weakEvidenceOutcome;
+            }
+
+            feedback.textContent = "Anklagen holder ikke.";
+            feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+            analysisCopy.textContent = outcome;
+            analysisBox.classList.remove("hidden");
+            revealBox.classList.add("hidden");
+          } else {
+            feedback.textContent = "Nesten. Les gjennom sporene igjen og prøv en ny kombinasjon.";
+            feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+          }
         }
       });
 

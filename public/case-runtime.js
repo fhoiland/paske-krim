@@ -42,11 +42,33 @@
   }
 
   function createCase(data) {
+    const caseNumber = Math.floor(1000 + Math.random() * 9000);
+    const difficulty = data.difficulties?.find((item) => item.id === data.selectedDifficulty) || data.difficulties?.[2];
+    const advancedPool =
+      difficulty?.level >= 4
+        ? (data.advancedCases || []).filter((item) => !item.minLevel || difficulty.level >= item.minLevel)
+        : [];
+
+    if (advancedPool.length) {
+      const selectedCase = randomFrom(advancedPool);
+      const hidingSpot = findById(data.hidingSpots, selectedCase.hidingSpotId);
+
+      return {
+        version: data.caseVersion,
+        caseNumber,
+        difficultyId: difficulty?.id || "sporhund",
+        culpritId: selectedCase.culpritId,
+        motiveId: selectedCase.motiveId,
+        hidingSpotId: selectedCase.hidingSpotId,
+        codedWord: shiftWord(hidingSpot.codeWord),
+        advancedCaseId: selectedCase.id,
+        createdAt: Date.now()
+      };
+    }
+
     const culprit = randomFrom(data.suspects);
     const motive = randomFrom(data.motives);
     const hidingSpot = randomFrom(data.hidingSpots);
-    const caseNumber = Math.floor(1000 + Math.random() * 9000);
-    const difficulty = data.difficulties?.find((item) => item.id === data.selectedDifficulty) || data.difficulties?.[2];
 
     return {
       version: data.caseVersion,

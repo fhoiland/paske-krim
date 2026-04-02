@@ -1,0 +1,39 @@
+---
+interface Props {
+  basePath: string;
+  currentTaskId: number;
+}
+
+const { basePath, currentTaskId } = Astro.props;
+const routes = [
+  { id: 1, label: "1", title: "Blindsonen", href: `${basePath}oppgave/1` },
+  { id: 2, label: "2", title: "Første mistanke", href: `${basePath}oppgave/2` },
+  { id: 3, label: "3", title: "Ruten ut", href: `${basePath}oppgave/3` },
+  { id: 4, label: "4", title: "Tidskollisjon", href: `${basePath}oppgave/4` },
+  { id: 5, label: "5", title: "Det lille sporet", href: `${basePath}oppgave/5` },
+  { id: 6, label: "F", title: "Anklagefase", href: `${basePath}finale` }
+];
+---
+
+<section id="advanced-map-shell" class="hidden panel-card">
+  <span class="section-pill">Sakskart</span>
+  <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    {routes.map((route) => (
+      <a
+        href={route.href}
+        data-route={route.id}
+        class:list={[
+          "route-card",
+          route.id === currentTaskId ? "route-card-current" : undefined
+        ]}
+      >
+        <span class="route-badge">{route.label}</span>
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-orange-800">Rute {route.label}</p>
+          <p class="mt-1 font-serif text-2xl text-stone-900">{route.title}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+  <p id="advanced-map-copy" class="mt-4 text-sm leading-7 text-stone-700"></p>
+</section>

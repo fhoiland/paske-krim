@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
+import { advancedCases } from "../data/advancedCases";
 import {
   agencyNames,
   caseKey,
@@ -98,6 +99,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       is:inline
       define:vars={{
         basePath,
+        advancedCases,
         caseKey,
         caseVersion,
         difficulties,
@@ -126,6 +128,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         return {
           caseKey,
           caseVersion,
+          advancedCases,
           difficulties,
           hidingSpots,
           motives,
@@ -136,6 +139,15 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       }
 
       function nextHref(progress) {
+        const active = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
+        if (active.level >= 4) {
+          if (!(progress.completed || []).includes(1)) return `${basePath}oppgave/1`;
+          const openRoutes = [2, 3, 4].filter((id) => !(progress.completed || []).includes(id));
+          if (openRoutes.length) return `${basePath}oppgave/${openRoutes[0]}`;
+          if (!(progress.completed || []).includes(5)) return `${basePath}oppgave/5`;
+          return `${basePath}finale`;
+        }
+
         const nextTask = (progress.completed?.length || 0) + 1;
         if (nextTask > totalTasks) return `${basePath}finale`;
         return `${basePath}oppgave/${nextTask}`;
