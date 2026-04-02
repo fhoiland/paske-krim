@@ -32,11 +32,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
   </Fragment>
 
-  <section class="panel-card">
-    <span class="section-pill">Mistenkte på dette nivået</span>
-    <div id={`suspects-task-${task.id}`} class="mt-5 grid gap-4 lg:grid-cols-2"></div>
-  </section>
-
   <InvestigationMap basePath={basePath} currentTaskId={task.id} />
 
   <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
@@ -143,12 +138,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const agencyEl = document.getElementById(`agency-task-${taskId}`);
     const difficultyEl = document.getElementById(`difficulty-task-${taskId}`);
     const timerEl = document.getElementById(`timer-task-${taskId}`);
-    const suspectsEl = document.getElementById(`suspects-task-${taskId}`);
     const submitEl = document.getElementById(`check-task-${taskId}`);
     const mapShell = document.getElementById("advanced-map-shell");
     const mapCopy = document.getElementById("advanced-map-copy");
     let selected = "";
     let correctAnswer = "";
+    let acceptedAnswers = [];
     let answerMode = "options";
     let attempts = 0;
     let activeHelperText = "";
@@ -164,20 +159,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     setInterval(() => {
       timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
     }, 1000);
-
-    suspectsEl.innerHTML = suspects
-      .map(
-        (suspect) => `
-          <article class="dossier-card briefing-person-card">
-            <p class="font-serif text-2xl text-stone-900">${suspect.name}</p>
-            <p class="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${suspect.role}</p>
-            <p class="briefing-copy">${suspect.style}</p>
-            <p class="briefing-copy"><strong>Alibi:</strong> ${suspect.alibi}</p>
-            <p class="briefing-copy text-stone-600"><strong>Typisk glipp:</strong> ${suspect.interviewTell}</p>
-          </article>
-        `
-      )
-      .join("");
 
     function normalizeAnswer(value) {
       return (value || "")
@@ -465,6 +446,11 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       return true;
     }
 
+    function answerMatches(chosen) {
+      const pool = acceptedAnswers?.length ? acceptedAnswers : [correctAnswer];
+      return pool.some((item) => normalizeAnswer(chosen) === normalizeAnswer(item));
+    }
+
     if (advancedCase) {
       if (!advancedUnlocked(taskId, progress)) {
         window.location.href = routeHref(advancedFallback(progress));
@@ -476,11 +462,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       const evidenceCards =
         scene?.evidenceIds?.map((id) => advancedCase.evidence.find((card) => card.id === id)).filter(Boolean) || [];
       const advancedParagraphs = taskId === 1 ? [...advancedCase.opening, ...scene.paragraphs] : scene.paragraphs;
+      const routeSolved = progress.completed.includes(taskId);
 
       addParagraphs(advancedParagraphs);
       promptEl.textContent = scene.prompt;
       setHelper(scene.helper);
-      renderEvidence(evidenceCards);
+      renderEvidence(routeSolved ? evidenceCards : []);
 
       if (taskId === 1) {
         addImageClue(
@@ -509,6 +496,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       }
 
       correctAnswer = scene.answer;
+      acceptedAnswers = scene.acceptedAnswers || [scene.answer];
 
       if (scene.answerMode === "input") {
         addInput("Skriv svaret", scene.placeholder || "");
@@ -518,8 +506,9 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
 
       successCopyEl.textContent = scene.success;
 
-      if (progress.completed.includes(taskId)) {
+      if (routeSolved) {
         unlockDelayedHelper();
+        renderEvidence(evidenceCards);
         successEl.classList.remove("hidden");
         renderSuccessLinks(progress);
         feedbackEl.textContent = "Denne ruta er allerede løst.";
@@ -535,8 +524,9 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           return;
         }
 
-        if (normalizeAnswer(chosen) === normalizeAnswer(correctAnswer)) {
+        if (answerMatches(chosen)) {
           progress = runtime.markCompleted(progressKey, taskId);
+          renderEvidence(evidenceCards);
           feedbackEl.textContent = "Riktig. Denne ruta gir dere noe som faktisk holder når saken blir vanskelig.";
           feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
           successEl.classList.remove("hidden");

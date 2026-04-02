@@ -19,6 +19,7 @@ export type AdvancedScene = {
   helper: string;
   answerMode: "input" | "options";
   answer: string;
+  acceptedAnswers?: string[];
   placeholder?: string;
   evidenceIds: string[];
   success: string;
@@ -88,13 +89,16 @@ export const advancedCases: AdvancedCase[] = [
         title: "Første mistanke",
         kicker: "Hvem ser skyldig ut hvis dere tenker for raskt?",
         paragraphs: [
-          "Rommet tilbyr et altfor pent svar. Rød voks langs sokkelen matcher Toves skiutstyr, og notatblokka hennes ble sett i nærheten av peisen tidligere på kvelden.",
-          "Det er akkurat denne typen spor slurvete etterforskere elsker: synlig, konkret og lett å fortelle høyt. Spørsmålet her er ikke hvem som faktisk gjorde det, men hvem saken ber dere mistenke først."
+          "Tørre voksrester ved peisen passer nesten altfor pent til Toves utstyr.",
+          "Overivrige vitner peker på målebåndet hennes og glemmer hvor behagelig det er å få et navn med én gang.",
+          "Ved første gjennomlesning virker alt solid, men hvert spor er laget for å stoppe tenkningen tidlig.",
+          "Egentlig er dette bare den personen saken vil at dere skal arrestere før dere har fortjent det."
         ],
-        prompt: "Hvem får den sterkeste første mistanken hvis dere følger de glatte, tidlige sporene?",
-        helper: "Velg den personen saken prøver å lure dere mot.",
-        answerMode: "options",
+        prompt: "Skriv navnet på personen saken vil at dere skal anklage for tidlig.",
+        helper: "Les forbokstavene i de fire linjene.",
+        answerMode: "input",
         answer: "tove",
+        placeholder: "navn",
         evidenceIds: ["red-wax-mark", "bridge-measure-note", "glitter-arc"],
         success: "Riktig. Tove er den pene, feilaktige første mistanken denne saken serverer med vilje."
       },
@@ -103,13 +107,14 @@ export const advancedCases: AdvancedCase[] = [
         title: "Ruten ut",
         kicker: "Hvor ble egget faktisk ført etter avledningen?",
         paragraphs: [
-          "I sidegangen finner dere en våt lapp brettet inn i et tørt håndkle. Koden på forsiden er vridd én bokstav frem, som om forfatteren trodde enkel kryptering kunne erstatte god dømmekraft.",
-          "Bak på lappen er ruten skissert med tre hakk: ut verandadøra, forbi vedstabelen, inn i et sted som holder på både varme og dårlig samvittighet."
+          "I sidegangen finner dere en våt lapp brettet inn i et tørt håndkle. Midt på lappen står ordet WFELBTTF skrevet med hard penn.",
+          "Baksiden er mindre dramatisk og langt mer nyttig: tre hakk markerer verandadøra, vedstabelen og et kort stoppested ingen gidder å sjekke hvis de fortsatt stirrer på voksen."
         ],
         prompt: "Dekod stedkoden og skriv den uten mellomrom.",
         helper: "Gå én bokstav tilbake i alfabetet. Ruten er like viktig som ordet.",
         answerMode: "input",
         answer: "VEDKASSE",
+        acceptedAnswers: ["VEDKASSE", "VEDKASSA"],
         placeholder: "stedkode",
         evidenceIds: ["woodbox-code-note", "veranda-slush"],
         success: "Riktig. Ruten peker mot vedkassen, ikke mot den mer teatralske flukten alle snakket om."
@@ -135,13 +140,16 @@ export const advancedCases: AdvancedCase[] = [
         title: "Det lille sporet",
         kicker: "Hvilket trivielt spor gjør den rette personen farlig konkret?",
         paragraphs: [
-          "Det er lett å gape over voksen, glitter og badstuekaos. Det er vanskeligere å stoppe ved noe så smått at man nesten ikke gidder å notere det.",
-          "Men kobberstøvet på håndklekroken i sidegangen kan ikke komme fra Tove, Jan eller Therese. Det kommer fra noen som var nær låsen, nær håndkleet og nær nok til å vite hvor pinlig hele demonstrasjonen kunne bli."
+          "Kalde metallkorn ligger igjen der et vått håndkle ble hektet av i fart.",
+          "Rett i sidegangen finnes ett lite punkt som binder lås, hudvarme og hastverk sammen.",
+          "Ofte blir slike små festepunkter oversett fordi resten av rommet skriker om større drama.",
+          "Kikk på starten av linjene hvis du fortsatt ikke ser hvor det lille sporet faktisk bor."
         ],
-        prompt: "Skriv nøkkelordet for det trivielle sporet som snur saken.",
-        helper: "Ikke skriv en hel setning. Skriv sporet som ord.",
+        prompt: "Skriv ordet for stedet det lille metallsporet faktisk satt på.",
+        helper: "Les forbokstavene i de fire linjene.",
         answerMode: "input",
-        answer: "KOBBERKROK",
+        answer: "KROK",
+        acceptedAnswers: ["KROK", "KOBBERKROK", "HÅNDKLEKROK", "HANDKLEKROK"],
         placeholder: "sporord",
         evidenceIds: ["copper-hook", "repair-receipt", "ash-cuff"],
         success: "Riktig. Det lille metallsporet er det som gjør teorien om Fredrik til mer enn en magefølelse."
@@ -300,13 +308,19 @@ export const advancedCases: AdvancedCase[] = [
         title: "Første mistanke",
         kicker: "Hvem ser mest skyldig ut hvis dere lar dere rive med av sceneshowet?",
         paragraphs: [
-          "Under duken ligger fiolett tape. På en cue-lapp står det at lyset skal treffe bordet nøyaktig ved midnatt. Therese oppfører seg dessuten som en som gjerne ville stjålet hele rommet om hun kunne.",
-          "Alt dette er godt nok til å anklage henne fort. Det er også akkurat derfor dere skal merke dere det som den første fristelsen, ikke den siste sannheten."
+          "Teipen under duken er akkurat teatralsk nok til å bli husket.",
+          "Hennes cue-kort ligger også synlig, som om rommet selv har valgt synderen for dere.",
+          "Et slikt oppsett er bygget for å gi dere et navn raskt.",
+          "Rommet roper på den mest sceniske kvinnen lenge før det peker på den mest kontrollerte.",
+          "Etterforskere som haster, stanser gjerne her og kaller det godt arbeid.",
+          "Skammen hennes er høylytt, men ikke avgjørende.",
+          "Egentlig er hun denne sakens vakreste feilspor."
         ],
-        prompt: "Hvem får den mest overbevisende første mistanken hvis dere følger scenesporet for langt?",
-        helper: "Velg personen saken vil at dere skal arrestere for tidlig.",
-        answerMode: "options",
+        prompt: "Skriv navnet på personen denne ruta vil at dere skal låse dere til for tidlig.",
+        helper: "Les forbokstavene i de sju linjene.",
+        answerMode: "input",
         answer: "therese",
+        placeholder: "navn",
         evidenceIds: ["violet-tape", "spotlight-card", "glitter-crescent"],
         success: "Riktig. Therese er den storslåtte feilanklagen denne saken lokker dere mot først."
       },
@@ -315,13 +329,14 @@ export const advancedCases: AdvancedCase[] = [
         title: "Ruten ut",
         kicker: "Hvor havnet originalen etter byttet?",
         paragraphs: [
-          "Bak en linserviett finner dere en liten kode skrevet med rolig hånd. Ikke panisk. Ikke full. Bare planlagt.",
-          "Ruten ut er kort: gang, ytterdør, mørke, skjulested som ingen gidder å se i hvis de fortsatt stirrer på teipen under duken."
+          "Bak en linserviett finner dere en liten kode skrevet med rolig hånd: QPTULBTTF.",
+          "Ruten ut er kort og skitten på den kjedelige måten: gang, ytterdør, mørke og et skjulested ingen gidder å se i hvis de fortsatt stirrer på teipen under duken."
         ],
         prompt: "Dekod stedkoden og skriv skjulestedet uten mellomrom.",
         helper: "Samme kode som før: én bokstav tilbake.",
         answerMode: "input",
         answer: "POSTKASSE",
+        acceptedAnswers: ["POSTKASSE", "POSTKASSA"],
         placeholder: "stedkode",
         evidenceIds: ["postbox-code-note", "front-step-salt"],
         success: "Riktig. Originalen ble ikke tatt langt. Den ble tatt kaldt."
@@ -347,13 +362,16 @@ export const advancedCases: AdvancedCase[] = [
         title: "Det lille sporet",
         kicker: "Hvilket tilsynelatende lite spor gjør bytte-teorien til en faktisk sak?",
         paragraphs: [
-          "Teip, glitter og store manerer er støy. Det lille sporet er nesten latterlig: fint veisalt på innsiden av en ellers ren linhanske.",
-          "Det betyr at en person som hevdet å holde seg i gangen, faktisk rakk den korte turen bort til postkassen med noe innpakket og ferdig forsvunnet."
+          "Små hvite korn er langt kjedeligere enn teip, glitter og voksenverdig panikk.",
+          "Alt det spektakulære i rommet prøver å lokke dere bort fra det mest praktiske sporet.",
+          "Langt viktigere enn silkekåpe og scenevaner er det fine stoffet som sitter på innsiden av hansken.",
+          "Turen ut var kort, kald og bare synlig for dem som gidder å lese smått."
         ],
-        prompt: "Skriv nøkkelordet for det trivielle sporet som snur saken.",
-        helper: "Tenk lite, kaldt og nesten oversett.",
+        prompt: "Skriv ordet for det lille stoffet som gjør denne ruten mulig.",
+        helper: "Les forbokstavene i de fire linjene.",
         answerMode: "input",
-        answer: "VEISALT",
+        answer: "SALT",
+        acceptedAnswers: ["SALT", "VEISALT"],
         placeholder: "sporord",
         evidenceIds: ["salt-cuff", "copy-padding", "linen-bag"],
         success: "Riktig. Saltet på hansken gjør dette til planlegging, ikke bare pynt og impuls."

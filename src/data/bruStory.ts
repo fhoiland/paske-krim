@@ -51,7 +51,7 @@ export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
 export const statsKey = "bru-hytte-paskekrim-stats";
-export const caseVersion = 7;
+export const caseVersion = 8;
 
 export const agencyNames = [
   "Bruagentene",
@@ -61,7 +61,7 @@ export const agencyNames = [
   "Operasjon Gulrotblink"
 ];
 
-export const versionBadge = "v7.0.0 | Nå med mørkere casebook, falske spor og nok logisk friksjon til å gi Bruagentene hodepine";
+export const versionBadge = "v7.1.0 | Nå med skjulte svar i ruteteksten og mindre mistenkt-babbel midt i sakskartet";
 
 export const storyBranches = {
   family: {
@@ -84,7 +84,7 @@ export const storyBranches = {
     briefingLead:
       "Dette er nattversjonen av Bru-saken: samme hytte, samme egg og samme grunnkaos, men med mer voksenhytteskam, dårligere bortforklaringer og langt skarpere kodeoppgaver.",
     briefingTip:
-      "På nivå 4 og 5 ligger svaret ofte gjemt i selve teksten. Se etter forbokstaver, mønstre, kodeord og setninger som virker litt for bevisst formulert, og ikke la all nakenpanikken distrahere dere fra faktisk bevis."
+      "På nivå 4 og 5 ligger løsningen i selve oppgaveteksten. Se etter forbokstaver, mønstre, kodeord og korte formuleringer som virker litt for bevisst bygget, og ikke la all nakenpanikken distrahere dere fra faktisk bevis."
   }
 } as const;
 
