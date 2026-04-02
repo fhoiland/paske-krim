@@ -154,19 +154,19 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 
       if (advancedCase) {
         if (!(progress.completed || []).includes(1)) {
-          window.location.href = `${basePath}oppgave/1`;
+          window.location.href = `${basePath}oppgave/1/`;
         }
 
         const missingRoutes = [2, 3, 4].filter((id) => !(progress.completed || []).includes(id));
         if (missingRoutes.length) {
-          window.location.href = `${basePath}oppgave/${missingRoutes[0]}`;
+          window.location.href = `${basePath}oppgave/${missingRoutes[0]}/`;
         }
 
         if (!(progress.completed || []).includes(5)) {
-          window.location.href = `${basePath}oppgave/5`;
+          window.location.href = `${basePath}oppgave/5/`;
         }
       } else if ((progress.completed?.length || 0) < totalTasks) {
-        window.location.href = `${basePath}oppgave/${(progress.completed?.length || 0) + 1}`;
+        window.location.href = `${basePath}oppgave/${(progress.completed?.length || 0) + 1}/`;
       }
       const feedback = document.getElementById("final-feedback");
       const leadCopy = document.getElementById("final-lead-copy");
@@ -330,7 +330,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       document.getElementById("restart-same-difficulty")?.addEventListener("click", () => {
         runtime.writeSettings(settingsKey, { difficultyId: difficulty.id });
         runtime.resetCase(caseData);
-        window.location.href = `${basePath}oppgave/1`;
+        window.location.href = `${basePath}oppgave/1/`;
       });
     </script>
   </StoryShell>

@@ -48,7 +48,9 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         </div>
 
         <div class="mt-6 flex flex-wrap gap-3">
-          <button id="start-first-task" type="button" class="submit-btn">Start oppgave 1</button>
+          <a id="start-first-task" href={`${basePath}oppgave/1/`} class="submit-btn inline-flex items-center justify-center">
+            Start oppgave 1
+          </a>
           <a
             href={basePath}
             class="inline-flex w-full items-center justify-center rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 sm:w-auto"
@@ -107,9 +109,6 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       document.getElementById("briefing-difficulty").textContent = difficulty.title;
       document.getElementById("briefing-humor").textContent = difficulty.humor;
 
-      document.getElementById("start-first-task")?.addEventListener("click", () => {
-        window.location.href = `${basePath}oppgave/1`;
-      });
     </script>
   </StoryShell>
 </MainLayout>

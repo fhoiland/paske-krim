@@ -1,0 +1,708 @@
+---
+import StoryShell from "./StoryShell.astro";
+import InvestigationMap from "./InvestigationMap.astro";
+import { advancedCases } from "../data/advancedCases";
+import {
+  agencyNames,
+  caseKey,
+  caseVersion,
+  difficulties,
+  hidingSpots,
+  motives,
+  progressKey,
+  settingsKey,
+  suspectRosters,
+  type TaskMeta,
+  totalTasks
+} from "../data/bruStory";
+
+interface Props {
+  task: TaskMeta;
+}
+
+const { task } = Astro.props;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}/` : basePath;
+---
+
+<StoryShell title={task.title} eyebrow={`Oppgave ${task.id} av ${totalTasks}`} kicker={task.scene}>
+  <Fragment slot="lead">
+    <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
+  </Fragment>
+
+  <InvestigationMap basePath={basePath} currentTaskId={task.id} />
+
+  <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+    <article class="panel-card">
+      <span class="section-pill">Etterforskningslogg</span>
+      <div id={`story-task-${task.id}`} class="mt-5 space-y-4 leading-8 text-stone-700"></div>
+      <div id={`evidence-task-${task.id}`} class="mt-6 hidden grid gap-3"></div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        <div class="rounded-[1.6rem] border border-dashed border-orange-300 bg-orange-50/70 p-4">
+          <p class="dossier-label">Saksnummer</p>
+          <p id={`case-number-${task.id}`} class="mt-2 font-serif text-3xl text-stone-900">Laster sak ...</p>
+        </div>
+        <div class="rounded-[1.6rem] border border-dashed border-orange-300 bg-orange-50/70 p-4">
+          <p class="dossier-label">Aktiv enhet</p>
+          <p id={`agency-task-${task.id}`} class="mt-2 font-serif text-2xl text-stone-900">Laster enhet ...</p>
+          <p id={`difficulty-task-${task.id}`} class="mt-2 text-sm font-semibold text-orange-900"></p>
+          <p id={`timer-task-${task.id}`} class="mt-3 text-lg font-bold text-stone-900">Tid i saken: 00:00</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel-card">
+      <span class="section-pill">Løs sporet</span>
+      <p id={`prompt-task-${task.id}`} class="mt-5 text-base leading-7 text-stone-700"></p>
+      <p id={`helper-task-${task.id}`} class="mt-3 text-sm font-semibold text-orange-900"></p>
+      <div id={`meta-task-${task.id}`} class="mt-4 hidden rounded-[1.2rem] border border-stone-700/10 bg-white/70 p-4 text-sm leading-7 text-stone-700"></div>
+      <div id={`image-task-${task.id}`} class="mt-4 hidden overflow-hidden rounded-[1.2rem] border border-stone-700/10 bg-white/80"></div>
+      <div id={`options-task-${task.id}`} class="mt-5 grid gap-3"></div>
+
+      <button class="submit-btn mt-5" id={`check-task-${task.id}`} type="button">
+        Sjekk svaret
+      </button>
+      <p class="mt-4 min-h-6 font-semibold" id={`feedback-task-${task.id}`}></p>
+
+      <div class="reveal-box mt-5 hidden" id={`success-task-${task.id}`}>
+        <p id={`success-copy-${task.id}`}></p>
+        <div id={`success-links-task-${task.id}`} class="mt-4 flex flex-wrap gap-3"></div>
+      </div>
+    </article>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{
+      advancedCases,
+      agencyNames,
+      basePath,
+      caseKey,
+      caseVersion,
+      difficulties,
+      hidingSpots,
+      motives,
+      previousHref,
+      progressKey,
+      settingsKey,
+      suspectRosters,
+      taskId: task.id
+    }}
+  >
+    const runtime = window.BruCaseRuntime;
+    const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
+    const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
+    const selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+    const caseData = {
+      caseKey,
+      caseVersion,
+      difficulties,
+      hidingSpots,
+      motives,
+      progressKey,
+      selectedDifficulty,
+      suspects: suspectRosters[selectedDifficulty] || suspectRosters[defaultDifficulty.id],
+      advancedCases
+    };
+    const caseFile = runtime.ensureCase(caseData);
+    let progress = runtime.readProgress(progressKey);
+
+    if (!progress.started) {
+      runtime.writeProgress(progressKey, { started: true, completed: [] });
+      progress = runtime.readProgress(progressKey);
+    }
+
+    const difficulty = difficulties.find((item) => item.id === caseFile.difficultyId) || defaultDifficulty;
+    const suspects = suspectRosters[difficulty.id] || suspectRosters[defaultDifficulty.id];
+    const culprit = runtime.findById(suspects, caseFile.culpritId);
+    const motive = runtime.findById(motives, caseFile.motiveId);
+    const hidingSpot = runtime.findById(hidingSpots, caseFile.hidingSpotId);
+    const advancedCase =
+      difficulty.level >= 4 ? advancedCases.find((item) => item.id === caseFile.advancedCaseId) || null : null;
+
+    const storyEl = document.getElementById(`story-task-${taskId}`);
+    const evidenceEl = document.getElementById(`evidence-task-${taskId}`);
+    const promptEl = document.getElementById(`prompt-task-${taskId}`);
+    const helperEl = document.getElementById(`helper-task-${taskId}`);
+    const metaEl = document.getElementById(`meta-task-${taskId}`);
+    const imageEl = document.getElementById(`image-task-${taskId}`);
+    const optionsEl = document.getElementById(`options-task-${taskId}`);
+    const feedbackEl = document.getElementById(`feedback-task-${taskId}`);
+    const successEl = document.getElementById(`success-task-${taskId}`);
+    const successCopyEl = document.getElementById(`success-copy-${taskId}`);
+    const successLinksEl = document.getElementById(`success-links-task-${taskId}`);
+    const caseNumberEl = document.getElementById(`case-number-${taskId}`);
+    const agencyEl = document.getElementById(`agency-task-${taskId}`);
+    const difficultyEl = document.getElementById(`difficulty-task-${taskId}`);
+    const timerEl = document.getElementById(`timer-task-${taskId}`);
+    const submitEl = document.getElementById(`check-task-${taskId}`);
+    const mapShell = document.getElementById("advanced-map-shell");
+    const mapCopy = document.getElementById("advanced-map-copy");
+    let selected = "";
+    let correctAnswer = "";
+    let acceptedAnswers = [];
+    let answerMode = "options";
+    let attempts = 0;
+    let activeHelperText = "";
+    const delayedHelper = difficulty.level >= 4;
+    let helperUnlocked = !delayedHelper;
+
+    caseNumberEl.textContent = `Bru-${caseFile.caseNumber}`;
+    agencyEl.textContent = advancedCase ? advancedCase.title : agencyNames[(caseFile.caseNumber + taskId) % agencyNames.length];
+    difficultyEl.textContent = advancedCase
+      ? `${difficulty.title} | ${advancedCase.tagline}`
+      : `${difficulty.title} | ${difficulty.humor}`;
+    timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
+    setInterval(() => {
+      timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
+    }, 1000);
+
+    function normalizeAnswer(value) {
+      return (value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/[.:,-]/g, "");
+    }
+
+    function addParagraphs(paragraphs) {
+      storyEl.innerHTML = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
+    }
+
+    function addMeta(copy) {
+      if (!copy) {
+        metaEl.classList.add("hidden");
+        metaEl.innerHTML = "";
+        return;
+      }
+
+      metaEl.classList.remove("hidden");
+      metaEl.innerHTML = copy;
+    }
+
+    function addImageClue(title, caption) {
+      imageEl.classList.remove("hidden");
+      imageEl.innerHTML = `
+        <img src="${basePath}bru-paskekrim.png" alt="Bevisfoto fra saken på Bru" class="h-56 w-full object-cover object-center" />
+        <div class="p-4">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${title}</p>
+          <p class="mt-2 text-sm leading-6 text-stone-700">${caption}</p>
+        </div>
+      `;
+    }
+
+    function addOptions(options) {
+      answerMode = "options";
+      optionsEl.innerHTML = options
+        .map(
+          (option) =>
+            `<button class="option-btn" data-option="${option.value}" type="button">${option.label}</button>`
+        )
+        .join("");
+
+      optionsEl.querySelectorAll("[data-option]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selected = button.dataset.option || "";
+          optionsEl.querySelectorAll("[data-option]").forEach((item) => item.classList.remove("selected-option"));
+          button.classList.add("selected-option");
+        });
+      });
+    }
+
+    function addInput(label, placeholder = "", autocapitalize = "characters") {
+      answerMode = "input";
+      optionsEl.innerHTML = `
+        <label class="grid gap-2">
+          <span class="text-sm font-semibold uppercase tracking-[0.16em] text-orange-800">${label}</span>
+          <input
+            id="task-input"
+            type="text"
+            placeholder="${placeholder}"
+            autocapitalize="${autocapitalize}"
+            class="answer-input"
+          />
+        </label>
+      `;
+      const input = document.getElementById("task-input");
+      input?.addEventListener("input", (event) => {
+        selected = normalizeAnswer(event.target.value);
+      });
+    }
+
+    function renderEvidence(cards) {
+      if (!cards?.length) {
+        evidenceEl.classList.add("hidden");
+        evidenceEl.innerHTML = "";
+        return;
+      }
+
+      evidenceEl.classList.remove("hidden");
+      evidenceEl.innerHTML = cards
+        .map(
+          (card) => `
+            <article class="evidence-card evidence-${card.tone}">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Beviskort</p>
+                  <p class="mt-1 font-serif text-2xl text-stone-900">${card.title}</p>
+                </div>
+                <span class="evidence-tone evidence-tone-${card.tone}">${
+                  card.tone === "ambiguous" ? "Kan mistolkes" : card.tone === "decisive" ? "Avgjørende" : "Støttende"
+                }</span>
+              </div>
+              <p class="mt-3 text-sm leading-6 text-stone-700">${card.detail}</p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                ${card.tags.map((tag) => `<span class="evidence-tag">${tag}</span>`).join("")}
+              </div>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    function optionPool(correctOption, extras, decoys) {
+      const wrongExtras = runtime.shuffle(extras.filter((item) => item.value !== correctOption.value));
+      const neededWrong = Math.max(1, difficulty.optionCount - 1);
+      const picked = wrongExtras.slice(0, neededWrong);
+
+      if (picked.length < neededWrong) {
+        picked.push(...runtime.shuffle(decoys).slice(0, neededWrong - picked.length));
+      }
+
+      return runtime.shuffle([correctOption, ...picked.slice(0, neededWrong)]);
+    }
+
+    function routeHref(routeId) {
+      return routeId === 6 ? `${basePath}finale/` : `${basePath}oppgave/${routeId}/`;
+    }
+
+    function advancedUnlocked(routeId, snapshot = progress) {
+      if (!advancedCase) return routeId <= (snapshot.completed?.length || 0) + 1;
+      if (routeId === 1) return true;
+      if (routeId >= 2 && routeId <= 4) return snapshot.completed.includes(1);
+      if (routeId === 5) return [2, 3, 4].every((id) => snapshot.completed.includes(id));
+      if (routeId === 6) return [1, 2, 3, 4, 5].every((id) => snapshot.completed.includes(id));
+      return false;
+    }
+
+    function advancedFallback(snapshot = progress) {
+      if (!snapshot.completed.includes(1)) return 1;
+      const openRoutes = [2, 3, 4].filter((id) => !snapshot.completed.includes(id));
+      if (openRoutes.length) return openRoutes[0];
+      if (!snapshot.completed.includes(5)) return 5;
+      return 6;
+    }
+
+    function renderSuccessLinks(snapshot = progress) {
+      if (!successLinksEl) return;
+
+      if (!advancedCase) {
+        const nextHref = taskId === totalTasks ? `${basePath}finale/` : routeHref(taskId + 1);
+        const nextLabel = taskId === totalTasks ? "Gå til finalen" : `Videre til oppgave ${taskId + 1}`;
+        successLinksEl.innerHTML = `
+          <a href="${nextHref}" class="inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800">
+            ${nextLabel}
+          </a>
+        `;
+        return;
+      }
+
+      const suggestions = taskId === 1
+        ? [2, 3, 4]
+        : taskId >= 2 && taskId <= 4
+          ? [2, 3, 4].filter((id) => !snapshot.completed.includes(id))
+          : [];
+
+      if (taskId >= 2 && taskId <= 4 && [2, 3, 4].every((id) => snapshot.completed.includes(id))) {
+        suggestions.push(5);
+      }
+
+      if (taskId === 5) {
+        suggestions.push(6);
+      }
+
+      if (!suggestions.length) {
+        suggestions.push(advancedFallback(snapshot));
+      }
+
+      successLinksEl.innerHTML = Array.from(new Set(suggestions))
+        .map((routeId) => {
+          const label =
+            routeId === 6
+              ? "Gå til anklagefasen"
+              : routeId === 5
+                ? "Åpne syntesen"
+                : `Åpne rute ${routeId}`;
+          return `
+            <a href="${routeHref(routeId)}" class="inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800">
+              ${label}
+            </a>
+          `;
+        })
+        .join("");
+    }
+
+    function wireMap(snapshot = progress) {
+      if (!advancedCase || !mapShell) return;
+
+      mapShell.classList.remove("hidden");
+      if (mapCopy) {
+        mapCopy.textContent =
+          taskId === 1
+            ? "Etter denne siden kan dere åpne rutene 2, 3 og 4 i valgfri rekkefølge. Det er hele poenget."
+            : "På høye nivåer går ikke saken rett fram. Bruk sakskartet, ikke magefølelsen.";
+      }
+
+      document.querySelectorAll("[data-route]").forEach((link) => {
+        const routeId = Number(link.dataset.route);
+        const completed = routeId !== 6 && snapshot.completed.includes(routeId);
+        const unlocked = advancedUnlocked(routeId, snapshot);
+        const isCurrent = routeId === taskId;
+
+        link.classList.toggle("route-card-locked", !unlocked);
+        link.classList.toggle("route-card-done", completed);
+        link.classList.toggle("route-card-current", isCurrent);
+        link.setAttribute("aria-disabled", String(!unlocked));
+      });
+    }
+
+    const genericDecoys = {
+      task1: [
+        { value: "snowman", label: "Snømannen utenfor var egentlig hjernen bak alt og krevde diplom." },
+        { value: "cocoa", label: "Kakaoen var så god at alle frivillig ga bort egget." },
+        { value: "weather", label: "Dette var bare et meteorologisk påskeuhell, ikke et tyveri." }
+      ],
+      suspects: [
+        { value: "grandma", label: "Bestemor Berit, som bare kom for vafler og å dømme alle." },
+        { value: "snowcat", label: "En mystisk snøkatt fra Bru som ingen faktisk har sett." },
+        { value: "janitor", label: "Vaktmester Roger, kjent for å mistenke alle gardiner." }
+      ],
+      hiding: [
+        { value: "attic-sock", label: "I en enslig ullsokk bak støvsugeren." },
+        { value: "sauna", label: "I den hemmelige badstua som ingen husker å ha bygget." },
+        { value: "moon", label: "På månen, fordi ekspertnivå liker store sprang." }
+      ],
+      motives: [
+        { value: "diet", label: "Tyven ville starte lavkarbo påske for hele hytta." },
+        { value: "podcast", label: "Tyven trengte innhold til podcasten 'Egg og bedrag'." },
+        { value: "drama", label: "Alt ble gjort for å vinne prisen 'mest dramatisk påskegjest'." }
+      ]
+    };
+
+    function helperText(taskNumber) {
+      const helperMap = {
+        1: {
+          max: "Bruagentene hvisker: Tenk på hva som ga tyven tid inne i hytta.",
+          high: "Se etter hva kaoset ute gjorde mulig inne.",
+          medium: "Det viktigste sporet er ikke den som ropte høyest.",
+          low: "Avledningen er ofte selve planen.",
+          minimal: "Ikke stirr på bildet. Les loggen."
+        },
+        2: {
+          max: `Finn personen som matcher sporet "${culprit.clueItem}".`,
+          high: "Ett spor og ett alibi krasjer tydelig.",
+          medium: "Sammenlikn detaljsporet med alibiene.",
+          low: "Noen lyver elegant, men sporet lyver mindre.",
+          minimal: "Se etter den svakeste forklaringen."
+        },
+        3: {
+          max: `Koden ${caseFile.codedWord} må forskyves tilbake for å gi svaret.`,
+          high: "Kodeordet er vridd, men ikke langt fra sannheten.",
+          medium: "Bruk både rutehint og kodehint.",
+          low: "Dekod først, vurder sted etterpå.",
+          minimal: "Løs koden, ikke knappen."
+        },
+        4: {
+          max: "Finn personen som ikke kan være på to steder samtidig.",
+          high: "Tidslinjen er viktigere enn dramaet.",
+          medium: "Ett navn sprekker når klokkeslett legges oppå spor.",
+          low: "Nå teller sammenheng mer enn enkeltdetaljer.",
+          minimal: "Gi meg nøkkelminuttet, ikke magefølelsen."
+        },
+        5: {
+          max: "Les notatene på nytt og se etter ett gjennomgående mønster i ordvalget.",
+          high: "Brevet, servietten og avhørsglippene peker i samme retning.",
+          medium: "Se etter hva som går igjen i små formuleringer.",
+          low: "Se etter det diskrete mønsteret, ikke det mest dramatiske.",
+          minimal: "Svaret ligger skjult i teksten, ikke i støyen."
+        }
+      };
+
+      return helperMap[taskNumber]?.[difficulty.helperStrength] || "";
+    }
+
+    function setHelper(copy) {
+      activeHelperText = copy || "";
+      helperEl.textContent = helperUnlocked ? activeHelperText : "Hint låses opp etter første feilforsøk.";
+    }
+
+    function unlockDelayedHelper() {
+      if (helperUnlocked || !activeHelperText) return false;
+      helperUnlocked = true;
+      helperEl.textContent = activeHelperText;
+      return true;
+    }
+
+    function answerMatches(chosen) {
+      const pool = acceptedAnswers?.length ? acceptedAnswers : [correctAnswer];
+      return pool.some((item) => normalizeAnswer(chosen) === normalizeAnswer(item));
+    }
+
+    if (advancedCase) {
+      if (!advancedUnlocked(taskId, progress)) {
+        window.location.href = routeHref(advancedFallback(progress));
+      }
+
+      wireMap(progress);
+
+      const scene = advancedCase.scenes[taskId];
+      const evidenceCards =
+        scene?.evidenceIds?.map((id) => advancedCase.evidence.find((card) => card.id === id)).filter(Boolean) || [];
+      const advancedParagraphs = taskId === 1 ? [...advancedCase.opening, ...scene.paragraphs] : scene.paragraphs;
+      const routeSolved = progress.completed.includes(taskId);
+
+      addParagraphs(advancedParagraphs);
+      promptEl.textContent = scene.prompt;
+      setHelper(scene.helper);
+      renderEvidence(routeSolved ? evidenceCards : []);
+
+      if (taskId === 1) {
+        addImageClue(
+          "Blindsonen",
+          "På høye nivåer er bildet bare støy. Hendelsesvinduet er det virkelige åstedet."
+        );
+        addMeta(`<p><strong>Casefile:</strong> ${advancedCase.title}</p><p class="mt-2">${advancedCase.tagline}</p>`);
+      }
+
+      if (taskId === 2) {
+        addMeta(`<p><strong>Regel for denne ruta:</strong> Finn hvem saken frister dere til å arrestere for tidlig.</p>`);
+      }
+
+      if (taskId === 3) {
+        addMeta(
+          `<p><strong>Kodehint:</strong> Bokstavene er forskjøvet én plass frem i alfabetet. Dere må gå én plass tilbake.</p>`
+        );
+      }
+
+      if (taskId === 4) {
+        addMeta(`<p><strong>Regel for denne ruta:</strong> Tidslinjen betyr mer enn temperament og skam.</p>`);
+      }
+
+      if (taskId === 5) {
+        addMeta(`<p><strong>Regel for denne ruta:</strong> Små spor vinner over spektakulære spor når saken blir voksen.</p>`);
+      }
+
+      correctAnswer = scene.answer;
+      acceptedAnswers = scene.acceptedAnswers || [scene.answer];
+
+      if (scene.answerMode === "input") {
+        addInput("Skriv svaret", scene.placeholder || "");
+      } else {
+        addOptions(runtime.shuffle(suspects.map((suspect) => ({ value: suspect.id, label: suspect.name }))));
+      }
+
+      successCopyEl.textContent = scene.success;
+
+      if (routeSolved) {
+        unlockDelayedHelper();
+        renderEvidence(evidenceCards);
+        successEl.classList.remove("hidden");
+        renderSuccessLinks(progress);
+        feedbackEl.textContent = "Denne ruta er allerede løst.";
+        feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
+      }
+
+      submitEl?.addEventListener("click", () => {
+        const chosen = answerMode === "input" ? normalizeAnswer(selected) : selected;
+
+        if (!chosen) {
+          feedbackEl.textContent = answerMode === "input" ? "Skriv inn svaret først." : "Velg et svaralternativ først.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
+          return;
+        }
+
+        if (answerMatches(chosen)) {
+          progress = runtime.markCompleted(progressKey, taskId);
+          renderEvidence(evidenceCards);
+          feedbackEl.textContent = "Riktig. Denne ruta gir dere noe som faktisk holder når saken blir vanskelig.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
+          successEl.classList.remove("hidden");
+          renderSuccessLinks(progress);
+          wireMap(progress);
+        } else {
+          attempts += 1;
+          const unlockedNow = attempts === 1 ? unlockDelayedHelper() : false;
+          feedbackEl.textContent =
+            delayedHelper
+              ? unlockedNow
+                ? "Det svaret kan føles riktig, men saken belønner ikke den raske teorien. Hintet er nå åpnet."
+                : "Det svaret kan føles riktig, men saken belønner ikke den raske teorien."
+              : "Ikke helt. Les sporene en gang til og vurder hva som er støy og hva som faktisk bærer vekt.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
+        }
+      });
+    } else {
+      if (taskId > 1 && !progress.completed.includes(taskId - 1)) {
+        window.location.href = previousHref;
+      }
+
+      if (taskId === 1) {
+        addParagraphs([
+          "Sambandsloggen viser at ropet ute kom akkurat idet glasslokket på premiestativet ble åpnet inne. Flere vitner husker bråk, løping og småegg i snøen, men ingen kan forklare hvorfor selve Bru-egget var ute av sikte allerede før alle kom tilbake.",
+          "Dette er ikke først og fremst et bildebevis, men et mønster i hendelser: høy lyd ute, kort tid alene inne og en perfekt sjanse for én person til å forsvinne to meter i stillhet."
+        ]);
+        addMeta(
+          `<p><strong>Sambandslogg:</strong> 18.07 rop ute. 18.08 døren slår opp. 18.09 glasslokket står allerede på gløtt.</p>`
+        );
+        addImageClue(
+          "Bevisfoto",
+          "Bildet viser kaoset på tunet. På de enklere nivåene holder det å forstå hva kaoset muliggjorde."
+        );
+        setHelper(helperText(1));
+
+        correctAnswer = "decoy";
+        promptEl.textContent = "Hva er den beste forklaringen på hele opptrinnet?";
+        addOptions(
+          optionPool(
+            {
+              value: "decoy",
+              label: "Flukten ute var en avledning mens det ekte Bru-egget ble stjålet inne i hytta"
+            },
+            [
+              {
+                value: "outside",
+                label: "Musen løp direkte av gårde med selve Bru-egget, og alt skjedde ute på tunet"
+              },
+              {
+                value: "hare",
+                label: "Påskeharen ropte fordi han selv mistet kontroll på premien ved et uhell"
+              }
+            ],
+            genericDecoys.task1
+          )
+        );
+        successCopyEl.textContent =
+          "Riktig. Nå vet dere at noen brukte det ytre kaoset som dekke for selve hovedtyveriet.";
+      }
+
+      if (taskId === 2) {
+        correctAnswer = culprit.id;
+        addParagraphs([
+          `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på Bru finnes det få ting som er mer avslørende enn feil person med riktig detalj på feil sted.`,
+          `Samtidig går dere gjennom alibiene: ${suspects
+            .map((suspect) => `${suspect.name} ${suspect.alibi}`)
+            .join(". ")}. Ett navn passer betydelig dårligere enn de andre.`
+        ]);
+        promptEl.textContent = "Hvem peker spor og alibier tydeligst mot?";
+        setHelper(helperText(2));
+        addOptions(
+          optionPool(
+            { value: culprit.id, label: culprit.name },
+            suspects.map((suspect) => ({ value: suspect.id, label: suspect.name })),
+            genericDecoys.suspects
+          )
+        );
+        successCopyEl.textContent = `Sporene peker mot ${culprit.name}. Nå har dere et navn det faktisk går an å bygge en sak rundt.`;
+      }
+
+      if (taskId === 3) {
+        addParagraphs([
+          `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det risset inn en pil og en enkel skisse av ruten noen fulgte etter at alle stormet ut.`,
+          `Rutehintet sier: ${hidingSpot.routeClue}. Den som løser koden riktig, vet også hvilket skjulested som passer.`
+        ]);
+        setHelper(helperText(3));
+        correctAnswer = hidingSpot.id;
+        promptEl.textContent = "Hvor ble Bru-egget gjemt?";
+        addOptions(
+          optionPool(
+            { value: hidingSpot.id, label: hidingSpot.label },
+            hidingSpots.map((spot) => ({ value: spot.id, label: spot.label })),
+            genericDecoys.hiding
+          )
+        );
+        successCopyEl.textContent = `${hidingSpot.revealText} Nå sitter dere med både rute og skjulested.`;
+      }
+
+      if (taskId === 4) {
+        correctAnswer = culprit.id;
+        addParagraphs([
+          `På notatveggen står tidslinjen slik: 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.`,
+          `Én forklaring sprekker når dere legger den oppå klokkeslett, varme ved peisen og stedet sporet ble funnet. ${culprit.name} sier: ${culprit.contradiction}.`,
+          "Ett navn passer dårlig med tidslinjen."
+        ]);
+        addMeta(
+          `<p><strong>Regel:</strong> Den skyldige må ha hatt tid til å utnytte avledningen, være nær premiestativet og samtidig levere et alibi som ikke tåler klokkeslett.</p>`
+        );
+        setHelper(helperText(4));
+        promptEl.textContent = "Hvem avsløres av tidslinjen?";
+        addOptions(
+          optionPool(
+            { value: culprit.id, label: culprit.name },
+            suspects.map((suspect) => ({ value: suspect.id, label: suspect.name })),
+            genericDecoys.suspects
+          )
+        );
+        successCopyEl.textContent = `${culprit.name} faller gjennom når klokkeslett, varme og forklaring presses mot hverandre.`;
+      }
+
+      if (taskId === 5) {
+        correctAnswer = motive.id;
+        addParagraphs([
+          `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med et enkelt kodeord, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
+          "Ingen av notatene sier svaret direkte. Men ordvalg, tone og glipper danner et mønster som peker mot ett motiv."
+        ]);
+        setHelper(helperText(5));
+        promptEl.textContent = "Hva var tyvens egentlige motiv?";
+        addOptions(
+          optionPool(
+            { value: motive.id, label: motive.label },
+            motives.map((item) => ({ value: item.id, label: item.label })),
+            genericDecoys.motives
+          )
+        );
+        successCopyEl.textContent = `${motive.revealText} Nå gjenstår bare sluttrapporten til ${agencyNames[3]}.`;
+      }
+
+      if (progress.completed.includes(taskId)) {
+        unlockDelayedHelper();
+        successEl.classList.remove("hidden");
+        renderSuccessLinks(progress);
+        feedbackEl.textContent = "Denne oppgaven er allerede løst.";
+        feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
+      }
+
+      submitEl?.addEventListener("click", () => {
+        const chosen = answerMode === "input" ? normalizeAnswer(selected) : selected;
+
+        if (!chosen) {
+          feedbackEl.textContent = answerMode === "input" ? "Skriv inn svaret først." : "Velg et svaralternativ først.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
+          return;
+        }
+
+        if (normalizeAnswer(chosen) === normalizeAnswer(correctAnswer)) {
+          progress = runtime.markCompleted(progressKey, taskId);
+          feedbackEl.textContent = "Riktig. Et nytt lag av saken faller på plass.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
+          successEl.classList.remove("hidden");
+          renderSuccessLinks(progress);
+        } else {
+          attempts += 1;
+          const unlockedNow = attempts === 1 ? unlockDelayedHelper() : false;
+          feedbackEl.textContent =
+            difficulty.level <= 2
+              ? "Nesten. Prøv igjen, superdetektiv."
+              : delayedHelper
+                ? unlockedNow
+                  ? "Ikke helt. Les sporene nøye og prøv igjen. Hintet er nå åpnet."
+                  : "Ikke helt. Les sporene nøye og prøv igjen."
+                : "Ikke helt. Les sporene nøye og prøv igjen.";
+          feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
+        }
+      });
+    }
+  </script>
+</StoryShell>
