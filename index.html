@@ -6,17 +6,20 @@
   <title>Påskemysteriet på Fjellro</title>
   <style>
     :root {
-      --bg-top: #f4edda;
-      --bg-bottom: #ccb087;
+      --bg-top: #fff4bf;
+      --bg-bottom: #d8b56f;
       --paper: rgba(255, 251, 244, 0.94);
       --paper-strong: rgba(255, 248, 237, 0.98);
       --ink: #2d211b;
       --muted: #66564a;
-      --accent: #b64a2d;
-      --accent-dark: #7f311d;
-      --accent-soft: rgba(182, 74, 45, 0.12);
-      --gold: #d89f2b;
-      --forest: #476041;
+      --accent: #d4663d;
+      --accent-dark: #934025;
+      --accent-soft: rgba(212, 102, 61, 0.12);
+      --gold: #efc84b;
+      --forest: #547247;
+      --sun: #fff2a4;
+      --pink: #f2c7cf;
+      --mint: #d8ead2;
       --border: rgba(88, 60, 39, 0.14);
       --shadow: 0 18px 45px rgba(59, 33, 20, 0.16);
     }
@@ -31,8 +34,36 @@
       font-family: "Palatino Linotype", Georgia, serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.65), transparent 28%),
-        linear-gradient(180deg, var(--bg-top) 0%, #ead9b7 46%, var(--bg-bottom) 100%);
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.72), transparent 28%),
+        radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.42), transparent 18%),
+        linear-gradient(180deg, var(--bg-top) 0%, #ffe18f 24%, #f4d17e 48%, var(--bg-bottom) 100%);
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 50%;
+      opacity: 0.35;
+    }
+
+    body::before {
+      width: 260px;
+      height: 260px;
+      top: 110px;
+      left: -70px;
+      background: radial-gradient(circle, rgba(242, 199, 207, 0.9), transparent 72%);
+    }
+
+    body::after {
+      width: 320px;
+      height: 320px;
+      right: -100px;
+      bottom: 80px;
+      background: radial-gradient(circle, rgba(216, 234, 210, 0.95), transparent 72%);
     }
 
     .snow {
@@ -56,6 +87,8 @@
     }
 
     .shell {
+      position: relative;
+      z-index: 1;
       width: min(1180px, calc(100% - 2rem));
       margin: 0 auto;
       padding: 2rem 0 4rem;
@@ -78,7 +111,7 @@
       overflow: hidden;
       padding: 2.2rem;
       background:
-        linear-gradient(135deg, rgba(80, 45, 28, 0.94), rgba(37, 31, 27, 0.88)),
+        linear-gradient(135deg, rgba(128, 64, 31, 0.94), rgba(64, 42, 24, 0.88)),
         linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
       color: #fff8ef;
     }
@@ -91,7 +124,25 @@
       width: 280px;
       height: 280px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(216, 159, 43, 0.34), transparent 72%);
+      background: radial-gradient(circle, rgba(255, 225, 118, 0.38), transparent 72%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      left: -24px;
+      top: -20px;
+      width: 170px;
+      height: 170px;
+      background:
+        radial-gradient(circle at 38% 45%, rgba(255, 249, 214, 0.96) 0 24%, transparent 25%),
+        radial-gradient(circle at 22% 37%, rgba(33, 33, 33, 0.85) 0 2%, transparent 3%),
+        radial-gradient(circle at 53% 37%, rgba(33, 33, 33, 0.85) 0 2%, transparent 3%),
+        radial-gradient(circle at 38% 53%, rgba(255, 173, 80, 0.95) 0 4%, transparent 5%),
+        radial-gradient(circle at 38% 66%, rgba(255, 249, 214, 0.96) 0 14%, transparent 15%),
+        radial-gradient(circle at 38% 82%, rgba(255, 249, 214, 0.96) 0 18%, transparent 19%);
+      opacity: 0.28;
+      transform: rotate(-12deg);
     }
 
     h1, h2, h3, p {
@@ -146,9 +197,14 @@
 
     .hero-note {
       border-radius: 24px;
-      background: rgba(255, 249, 238, 0.93);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 241, 0.97), rgba(255, 246, 225, 0.92));
       color: var(--ink);
       transform: rotate(-1deg);
+    }
+
+    .hero-note:nth-child(2) {
+      transform: rotate(1deg);
     }
 
     .progress {
@@ -161,8 +217,8 @@
     .badge {
       padding: 0.65rem 0.95rem;
       border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255, 247, 205, 0.15);
+      border: 1px solid rgba(255, 245, 202, 0.28);
     }
 
     .mid-grid {
@@ -173,6 +229,38 @@
     .board {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-top: 1.4rem;
+    }
+
+    .card,
+    .timeline,
+    .evidence,
+    .case-file,
+    .final-card,
+    .suspect {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 244, 0.98), rgba(249, 239, 217, 0.95));
+    }
+
+    .card::after,
+    .timeline::after,
+    .evidence::after,
+    .final-card::after {
+      content: "";
+      position: absolute;
+      top: -28px;
+      right: -28px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 35%, rgba(255,255,255,0.75) 0 8%, transparent 9%),
+        radial-gradient(circle at 70% 42%, rgba(255,255,255,0.75) 0 8%, transparent 9%),
+        radial-gradient(circle at 52% 72%, rgba(255,255,255,0.75) 0 8%, transparent 9%),
+        linear-gradient(135deg, rgba(242, 199, 207, 0.55), rgba(216, 234, 210, 0.48));
+      opacity: 0.55;
+      transform: rotate(22deg);
     }
 
     .locked {
@@ -276,7 +364,8 @@
     }
 
     .timeline {
-      background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(246, 236, 221, 0.96));
+      background:
+        linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(247, 238, 211, 0.96));
     }
 
     .timeline-item + .timeline-item {
@@ -305,8 +394,8 @@
       display: inline-block;
       padding: 0.28rem 0.58rem;
       border-radius: 999px;
-      background: rgba(216, 159, 43, 0.18);
-      color: #785000;
+      background: rgba(239, 200, 75, 0.24);
+      color: #7c5600;
       font-size: 0.82rem;
       margin-bottom: 0.7rem;
     }
@@ -332,6 +421,56 @@
       color: rgba(45, 33, 27, 0.75);
     }
 
+    .spring-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .spring-chip {
+      padding: 0.55rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255, 250, 228, 0.92);
+      border: 1px solid rgba(212, 102, 61, 0.16);
+      color: var(--accent-dark);
+      font-size: 0.92rem;
+    }
+
+    .egg-garland {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-end;
+      margin-top: 1.2rem;
+    }
+
+    .egg {
+      width: 26px;
+      height: 34px;
+      border-radius: 50% 50% 47% 47% / 55% 55% 42% 42%;
+      box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .egg.one {
+      background:
+        linear-gradient(180deg, #ffe9ef 0 35%, #f3b8c4 35% 45%, #ffe9ef 45% 100%);
+    }
+
+    .egg.two {
+      background:
+        linear-gradient(180deg, #fff6c7 0 34%, #f3cf4f 34% 46%, #fff6c7 46% 100%);
+    }
+
+    .egg.three {
+      background:
+        linear-gradient(180deg, #e6f5df 0 34%, #a4cf91 34% 46%, #e6f5df 46% 100%);
+    }
+
+    .egg.four {
+      background:
+        linear-gradient(180deg, #f9ead4 0 34%, #e2a86e 34% 46%, #f9ead4 46% 100%);
+    }
+
     @media (max-width: 920px) {
       .hero-grid,
       .mid-grid,
@@ -355,9 +494,21 @@
         vinner. For å løse saken må dere sammenligne forklaringer, tolke spor og låse opp nye deler
         av mysteriet.
       </p>
+      <div class="spring-row">
+        <span class="spring-chip">Påskeegg</span>
+        <span class="spring-chip">Appelsiner</span>
+        <span class="spring-chip">Hyttekakao</span>
+        <span class="spring-chip">Vårsol</span>
+      </div>
       <div class="progress">
         <div class="badge">Løste spor: <span id="progress-count">0</span>/4</div>
         <div class="badge">Mistanke: <span id="status-text">Saken er helt åpen</span></div>
+      </div>
+      <div class="egg-garland" aria-hidden="true">
+        <span class="egg one"></span>
+        <span class="egg two"></span>
+        <span class="egg three"></span>
+        <span class="egg four"></span>
       </div>
 
       <div class="hero-grid">
