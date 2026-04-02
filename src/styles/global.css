@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    overflow-wrap: anywhere;
+  }
+}
+
 @theme {
   --font-serif: "Palatino Linotype", Georgia, serif;
 }
@@ -7,6 +13,7 @@
 @layer components {
   .hero-card {
     @apply relative overflow-hidden rounded-[1.7rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,244,219,0.94))] p-4 shadow-[0_16px_38px_rgba(48,34,20,0.14)] backdrop-blur sm:rounded-[2.2rem] sm:p-8 sm:shadow-[0_20px_55px_rgba(48,34,20,0.16)];
+    overflow-wrap: anywhere;
   }
 
   .hero-card::before {
@@ -23,6 +30,7 @@
 
   .panel-card {
     @apply relative overflow-hidden rounded-[1.5rem] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(249,244,229,0.94))] p-4 shadow-[0_14px_28px_rgba(59,33,20,0.12)] backdrop-blur sm:rounded-[2rem] sm:p-6 sm:shadow-[0_18px_45px_rgba(59,33,20,0.14)];
+    overflow-wrap: anywhere;
   }
 
   .panel-card::after {
@@ -66,6 +74,7 @@
 
   .dossier-card {
     @apply rounded-[1.2rem] border border-stone-700/10 bg-white/72 p-3.5 shadow-[0_8px_18px_rgba(59,33,20,0.08)] sm:rounded-[1.5rem] sm:p-4 sm:shadow-[0_10px_25px_rgba(59,33,20,0.08)];
+    overflow-wrap: anywhere;
   }
 
   .dossier-label {
@@ -74,6 +83,7 @@
 
   .option-btn {
     @apply w-full rounded-[1rem] border border-stone-700/10 bg-white/88 px-4 py-3.5 text-left text-sm leading-6 text-stone-800 shadow-[0_8px_18px_rgba(59,33,20,0.06)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50 sm:rounded-[1.2rem] sm:py-4 sm:text-base;
+    overflow-wrap: anywhere;
   }
 
   .selected-option {
@@ -90,6 +100,7 @@
 
   .difficulty-card {
     @apply w-full rounded-[1.2rem] border border-stone-700/10 bg-white/80 px-4 py-4 shadow-[0_10px_25px_rgba(59,33,20,0.08)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50/80 sm:rounded-[1.5rem] sm:px-5 sm:py-5;
+    overflow-wrap: anywhere;
   }
 
   .selected-difficulty {
@@ -102,14 +113,25 @@
 
   .clue-tile {
     @apply rounded-[1.1rem] border border-stone-700/10 bg-white/88 p-4 shadow-[0_8px_18px_rgba(59,33,20,0.06)];
+    overflow-wrap: anywhere;
   }
 
   .code-display {
     @apply rounded-[1rem] bg-stone-950 px-4 py-4 font-mono text-lg tracking-[0.2em] text-amber-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)];
+    overflow-wrap: anywhere;
   }
 
   .answer-input {
     @apply w-full rounded-[1rem] border border-stone-700/10 bg-white px-4 py-3 text-base text-stone-900 shadow-[0_8px_18px_rgba(59,33,20,0.06)] outline-none focus:border-orange-400;
+  }
+
+  .briefing-person-card {
+    @apply grid gap-2.5;
+  }
+
+  .briefing-copy {
+    @apply text-sm leading-6 text-stone-700;
+    overflow-wrap: anywhere;
   }
 }
 
