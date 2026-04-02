@@ -10,6 +10,7 @@ import {
   motives,
   progressKey,
   settingsKey,
+  storyBranches,
   storyTitle,
   suspectRosters,
   totalTasks
@@ -23,7 +24,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 <MainLayout title={`Briefing | ${storyTitle}`}>
   <StoryShell title="Briefing før saken" eyebrow="Saksbrief" kicker="Møt de mistenkte">
     <Fragment slot="lead">
-      <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
+      <p id="briefing-lead" class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         Før dere går løs på oppgave 1, får dere en kort briefing med nivå, mistenkte og det viktigste
         dere bør ha i bakhodet når kaoset på Bru starter.
       </p>
@@ -79,6 +80,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         motives,
         progressKey,
         settingsKey,
+        storyBranches,
         suspectRosters
       }}
     >
@@ -107,10 +109,12 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       }
 
       const difficulty = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
+      const branch = difficulty.level >= 4 ? storyBranches.adult : storyBranches.family;
+      document.getElementById("briefing-lead").textContent = branch.briefingLead;
       document.getElementById("briefing-difficulty").textContent = difficulty.title;
       document.getElementById("briefing-humor").textContent = difficulty.humor;
       document.getElementById("briefing-agency").textContent =
-        `${agencyNames[difficulty.level % agencyNames.length]} anbefaler at dere leser både stil, alibi og små rare glipper før dere går videre.`;
+        `${agencyNames[difficulty.level % agencyNames.length]} anbefaler: ${branch.briefingTip}`;
 
       document.getElementById("briefing-roster").innerHTML = roster
         .map(

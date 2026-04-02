@@ -122,6 +122,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     }
 
     const difficulty = difficulties.find((item) => item.id === caseFile.difficultyId) || defaultDifficulty;
+    const isAdultCase = difficulty.level >= 4;
     const suspects = suspectRosters[difficulty.id] || suspectRosters[defaultDifficulty.id];
     const culprit = runtime.findById(suspects, caseFile.culpritId);
     const motive = runtime.findById(motives, caseFile.motiveId);
@@ -210,6 +211,27 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       }
 
       return "har rar stil, men tidslinjen tåler fortsatt forklaringen bedre";
+    }
+
+    function firstLetterBoard(answer, entries) {
+      const chars = answer.split("");
+      return chars
+        .map(
+          (char, index) =>
+            `<p><strong class="mr-1 inline-block w-4 text-stone-900">${char}</strong>${entries[index % entries.length]}</p>`
+        )
+        .join("");
+    }
+
+    function emphasizedWordBoard(answer, words) {
+      return answer
+        .split("")
+        .map((char, index) => {
+          const word = words[char] || `${char}odeord`;
+          const prefix = index % 2 === 0 ? "Marker" : "Les";
+          return `<p>${prefix} <strong>${word}</strong> og noter forbokstaven.</p>`;
+        })
+        .join("");
     }
 
     function addImageClue(title, caption) {
@@ -338,11 +360,37 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       ]
     };
 
+    const motiveWordBank = {
+      A: "Afterski",
+      B: "Bobler",
+      E: "Entré",
+      G: "Glitter",
+      H: "Håndkle",
+      I: "Isbøtte",
+      J: "Jacuzzi",
+      K: "Kåpe",
+      L: "Lyskaster",
+      O: "Omvei",
+      P: "Paljetter",
+      R: "Rykte",
+      S: "Sauna",
+      T: "Tøfler",
+      V: "Veranda",
+      Y: "Ytterdør"
+    };
+
     if (taskId === 1) {
-      addParagraphs([
-        "Sambandsloggen viser at ropet ute kom akkurat idet glasslokket på premiestativet ble åpnet inne. Flere vitner husker bråk, løping og småegg i snøen, men ingen kan forklare hvorfor selve Bru-egget var ute av sikte allerede før alle kom tilbake.",
-        "Dette er ikke først og fremst et bildebevis, men et mønster i hendelser: høy lyd ute, kort tid alene inne og en perfekt sjanse for én person til å forsvinne to meter i stillhet."
-      ]);
+      addParagraphs(
+        isAdultCase
+          ? [
+              "Nattloggen viser at harekaoset ute startet akkurat idet glasslokket på premiestativet ble løftet inne. Samtidig innrømmer tre voksne at de brukte noen sekunder på å hente kåpe, nøkkel eller verdighet før de gikk ut.",
+              "Poenget er ikke bildet alene. Poenget er avledningen: høy lyd ute, et kort vindu inne og en person som fikk være pinlig ubemerket midt i et allerede pinlig øyeblikk."
+            ]
+          : [
+              "Sambandsloggen viser at ropet ute kom akkurat idet glasslokket på premiestativet ble åpnet inne. Flere vitner husker bråk, løping og småegg i snøen, men ingen kan forklare hvorfor selve Bru-egget var ute av sikte allerede før alle kom tilbake.",
+              "Dette er ikke først og fremst et bildebevis, men et mønster i hendelser: høy lyd ute, kort tid alene inne og en perfekt sjanse for én person til å forsvinne to meter i stillhet."
+            ]
+      );
       addMeta(
         `<p><strong>Sambandslogg:</strong> 18.07 rop ute. 18.08 døren slår opp. 18.09 glasslokket står allerede på gløtt.</p>`
       );
@@ -387,7 +435,9 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     if (taskId === 2) {
       correctAnswer = culprit.id;
       addParagraphs([
-        `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på Bru finnes det få ting som er mer avslørende enn feil person med riktig detalj på feil sted.`,
+        isAdultCase
+          ? `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på dette nivået er de små restene ofte mer ærlige enn forklaringer levert av voksne som helst vil snakke om noe helt annet.`
+          : `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på Bru finnes det få ting som er mer avslørende enn feil person med riktig detalj på feil sted.`,
         `Samtidig går dere gjennom alibiene: ${suspects
           .map((suspect) => `${suspect.name} ${suspect.alibi}`)
           .join(". ")}. Ett navn passer betydelig dårligere enn de andre.`
@@ -405,10 +455,17 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     }
 
     if (taskId === 3) {
-      addParagraphs([
-        `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det risset inn en pil og en enkel skisse av ruten noen fulgte etter at alle stormet ut.`,
-        `Rutehintet sier: ${hidingSpot.routeClue}. Den som løser koden riktig, vet også hvilket skjulested som passer.`
-      ]);
+      addParagraphs(
+        isAdultCase
+          ? [
+              `Mellom verandaen og bekken finner dere en våt lapp med koden ${caseFile.codedWord}. På baksiden står en altfor selvsikker nattnotis skrevet av noen som tydelig trodde kryptert håndskrift var det samme som diskresjon.`,
+              `Rutehintet sier: ${hidingSpot.routeClue}. Løs koden først, så ser dere hvorfor akkurat dette stedet passet perfekt i nattens halvplanlagte kaos.`
+            ]
+          : [
+              `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det risset inn en pil og en enkel skisse av ruten noen fulgte etter at alle stormet ut.`,
+              `Rutehintet sier: ${hidingSpot.routeClue}. Den som løser koden riktig, vet også hvilket skjulested som passer.`
+            ]
+      );
       helperEl.textContent = helperText(3);
 
       if (difficulty.level >= 4) {
@@ -437,34 +494,68 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       addParagraphs(
         difficulty.level === 5
           ? [
-              "Ekspertnivået bruker en komprimert saksvegg i stedet for lang forklaring. Her må dere lese motsetningene raskt og finne hvem som faktisk ikke kan være der de sier, samtidig som halve hytta prøver å late som den pinlige badstuerunden aldri skjedde."
+              "Ekspertnivået bruker en kort saksvegg. Her må dere kombinere tidslinjen med en skjult navnekode. Svaret står faktisk i teksten, men bare hvis dere leser riktig vei."
             ]
-          : [
-              `På notatveggen står tidslinjen slik: 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.`,
-              `Én forklaring sprekker når dere legger den oppå klokkeslett, varme ved peisen og stedet sporet ble funnet. ${culprit.name} sier: ${culprit.contradiction}.`,
-              difficulty.level >= 4
-                ? "Her holder det ikke å kjenne igjen et spor. Dere må se hvem som hevder å være ute, inne eller et helt annet sted på feil tidspunkt, og hvem som prøver å kamuflere klønete voksenoppførsel som uskyldig hyttestemning."
-                : "Ett navn passer dårlig med tidslinjen."
-            ]
+          : isAdultCase
+            ? [
+                "Notatveggen er kort og stygg: 18.07 rop ute, 18.08 folk stormer ut, 18.09 skygge ved peisen, 18.11 egget oppdages borte.",
+                "I nattloggen ligger også en skjult navnekode. Den skyldige er den eneste som både sprekker i tidslinjen og dukker opp når dere leser sporene loddrett."
+              ]
+            : [
+                `På notatveggen står tidslinjen slik: 18.07 rop ute, 18.08 første personer ut døra, 18.09 kort skygge ved peisen, 18.11 egget oppdages borte.`,
+                `Én forklaring sprekker når dere legger den oppå klokkeslett, varme ved peisen og stedet sporet ble funnet. ${culprit.name} sier: ${culprit.contradiction}.`,
+                "Ett navn passer dårlig med tidslinjen."
+              ]
       );
       addMeta(
         difficulty.level === 5
           ? `
-            <div class="puzzle-grid">
-              ${suspects
-                .map(
-                  (suspect) => `
-                    <article class="clue-tile">
-                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">${suspect.name}</p>
-                      <p class="mt-2 text-sm leading-6 text-stone-700">${contradictionMini(suspect)}</p>
-                      <p class="mt-2 text-xs font-semibold text-stone-500">${suspect.interviewTell}</p>
-                    </article>
-                  `
-                )
-                .join("")}
+            <div class="grid gap-4">
+              <article class="clue-tile">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Tidslinjebrudd</p>
+                <p class="mt-2 text-sm leading-6 text-stone-700">Peisvarmen peker mot ${culprit.clueItem}, og bare én person tåler ikke 18.09-testen.</p>
+              </article>
+              <article class="clue-tile">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Nattlogg</p>
+                <div class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+                  ${firstLetterBoard(normalizeAnswer(culprit.name), [
+                    "rodde seg bort i klokkeslettet.",
+                    "visste litt for mye om peisområdet.",
+                    "avslørte seg med en altfor glatt bortforklaring.",
+                    "nektet for å ha vært inne lenge nok.",
+                    "tok feil av hva vitnene faktisk så.",
+                    "glemte at sporene var tørrere enn historien."
+                  ])}
+                </div>
+              </article>
+              <article class="clue-tile">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Regel</p>
+                <p class="mt-2 text-sm leading-6 text-stone-700">Les første bokstav i hver nattlogglinje. Kryssjekk så navnet mot tidslinjen og peisglippen.</p>
+              </article>
             </div>
-            <p class="mt-4"><strong>Regel:</strong> Den skyldige må ha vært nær peisen rundt 18.09 og samtidig ha levert en forklaring som ikke tåler tidslinjen, badstuekaoset eller den kollektive skammen morgenen etter.</p>
           `
+          : isAdultCase
+            ? `
+              <div class="grid gap-4">
+                <article class="clue-tile">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Kort nattlogg</p>
+                  <div class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+                    ${firstLetterBoard(normalizeAnswer(culprit.name), [
+                      "rodde seg ut på glatt alibi-is.",
+                      "viste seg for nær peisen.",
+                      "angret seg altfor sent.",
+                      "tok en omvei som ikke finnes i planen.",
+                      "glemte hva vitnene faktisk sa.",
+                      "nektet for noe sporene allerede hadde forklart."
+                    ])}
+                  </div>
+                </article>
+                <article class="clue-tile">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Lesehjelp</p>
+                  <p class="mt-2 text-sm leading-6 text-stone-700">Les forbokstavene nedover. Bare ett navn tåler både koden og tidslinjen dårlig.</p>
+                </article>
+              </div>
+            `
           : `<p><strong>Regel:</strong> Den skyldige må ha hatt tid til å utnytte avledningen, være nær premiestativet og samtidig levere et alibi som ikke tåler klokkeslett.</p>`
       );
       helperEl.textContent = helperText(4);
@@ -502,12 +593,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       addParagraphs(
         difficulty.level === 5
           ? [
-              "Nå er dere i ren kodeknekkermodus. Dere får ikke motivet servert som setning. Dere må utlede selve motivkoden fra komprimerte spor, småfrekke kommentarer og et kveldsopplegg som tydelig skled fra påskekos til voksen katastrofekomedie."
+              "Nå er dere i ren kodeknekkermodus. Motivkoden finnes både skjult i teksten og kryptert i strengene. Leser dere bare fort, blir dette gjetting. Leser dere smart, er svaret ganske nådeløst tydelig."
             ]
           : [
               `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med ordet ${phraseHint}, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
               difficulty.level >= 4
-                ? "Dette er ikke lenger bare en motivoppgave. Dere må lese språk, tone og plan som ett mønster. Kodeordet dere finner skal peke direkte mot hvorfor tyven gjorde dette, og hvorfor flere voksne nå er desperate etter at ingen nevner hva som skjedde mellom badstua og stua."
+                ? "Dette er ikke lenger bare en motivoppgave. Dere må lese språk, tone og plan som ett mønster. Kodeordet ligger skjult i teksten, og krypteringen fungerer som kontroll på at dere faktisk har tenkt riktig."
                 : "Når dere legger brevlappen og avhørsglippene ved siden av hverandre, peker alt mot ett motiv."
             ]
       );
@@ -520,6 +611,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           difficulty.level === 5
             ? `
               <div class="grid gap-4">
+                <article class="clue-tile">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Skjult i teksten</p>
+                  <div class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+                    ${emphasizedWordBoard(motiveKeyword, motiveWordBank)}
+                  </div>
+                </article>
                 <article class="clue-tile">
                   <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Kryptert streng</p>
                   <div class="code-display mt-3">${encodeForExpert(motiveKeyword)}</div>
@@ -536,11 +633,26 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
                 </div>
                 <article class="clue-tile">
                   <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Kontrollord</p>
-                  <p class="mt-2 text-sm leading-6 text-stone-700">Brevet peker mot <strong>${phraseHint}</strong>. Intervjuglipp: ${culprit.interviewTell}.</p>
+                  <p class="mt-2 text-sm leading-6 text-stone-700">Brevet peker mot <strong>${phraseHint}</strong>. Intervjuglipp: ${culprit.interviewTell}. Når tekstsporet og krypteringen sier det samme, har dere motivkoden.</p>
                 </article>
               </div>
             `
-            : `<p><strong>Kryssforhør:</strong> Velg den korte motivkoden, ikke hele forklaringen.</p>`
+            : isAdultCase
+              ? `
+                <div class="grid gap-4">
+                  <article class="clue-tile">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Skjult kode</p>
+                    <div class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+                      ${emphasizedWordBoard(motiveKeyword, motiveWordBank)}
+                    </div>
+                  </article>
+                  <article class="clue-tile">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-800">Lesehjelp</p>
+                    <p class="mt-2 text-sm leading-6 text-stone-700">Ta forbokstaven i hvert uthevede ord. Det gir motivkoden rett ut, hvis dere har lest nattnotatene riktig.</p>
+                  </article>
+                </div>
+              `
+              : `<p><strong>Kryssforhør:</strong> Velg den korte motivkoden, ikke hele forklaringen.</p>`
         );
         addInput("Skriv motivkode", motiveKeyword);
       } else {

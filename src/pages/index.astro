@@ -7,11 +7,11 @@ import {
   caseVersion,
   difficulties,
   hidingSpots,
-  introText,
   motives,
   progressKey,
   settingsKey,
   statsKey,
+  storyBranches,
   storyTitle,
   suspectRosters,
   totalTasks
@@ -34,8 +34,8 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <section class="grid gap-6">
       <article class="panel-card">
         <span class="section-pill">Forhistorien</span>
-        <div class="mt-5 space-y-4 leading-8 text-stone-700">
-          {introText.map((paragraph) => <p>{paragraph}</p>)}
+        <div id="intro-copy" class="mt-5 space-y-4 leading-8 text-stone-700">
+          {storyBranches.family.intro.map((paragraph) => <p>{paragraph}</p>)}
         </div>
 
         <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -105,6 +105,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         motives,
         progressKey,
         settingsKey,
+        storyBranches,
         statsKey,
         suspectRosters,
         totalTasks
@@ -115,6 +116,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const continueButton = document.getElementById("continue-story");
       const difficultyLabel = document.getElementById("difficulty-current-label");
       const bestTimeLabel = document.getElementById("best-time-label");
+      const introContainer = document.getElementById("intro-copy");
       const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
       const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
       const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
@@ -143,8 +145,12 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         const active = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
         const stats = runtime.readStats(statsKey);
         const best = stats.bestTimes?.[active.id];
+        const branch = active.level >= 4 ? storyBranches.adult : storyBranches.family;
         difficultyLabel.textContent = `${active.title} valgt`;
         bestTimeLabel.textContent = best ? runtime.formatDuration(best) : "Ingen løst ennå";
+        if (introContainer) {
+          introContainer.innerHTML = branch.intro.map((paragraph) => `<p>${paragraph}</p>`).join("");
+        }
         difficultyButtons.forEach((button) => {
           const isActive = button.dataset.difficulty === selectedDifficulty;
           button.classList.toggle("selected-difficulty", isActive);

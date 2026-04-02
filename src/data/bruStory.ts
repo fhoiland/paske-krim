@@ -51,7 +51,7 @@ export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
 export const settingsKey = "bru-hytte-paskekrim-settings";
 export const statsKey = "bru-hytte-paskekrim-stats";
-export const caseVersion = 5;
+export const caseVersion = 6;
 
 export const agencyNames = [
   "Bruagentene",
@@ -61,13 +61,34 @@ export const agencyNames = [
   "Operasjon Gulrotblink"
 ];
 
-export const versionBadge = "v6.0.0 | Nå med såpass mye påskekrim at selv Kripos avdeling Bru ba oss roe oss litt";
+export const versionBadge = "v6.1.0 | Nå med skjulte løsninger, voksenhytteskam og nok kodekrim til å gjøre haren svett i ørene";
 
-export const introText = [
-  "Påskeaften på hytta på Bru skulle bli årets store finale. Premiebordet sto klart, det legendariske Bru-egget lå under glasslokk, og alle gjestene ventet på den høytidelige avdukingen.",
-  "Så smalt sambandsradioen. Påskeharen skrek ute på tunet, en mus med kaninører raste gjennom snøen med en sekk småegg, og hele gjengen styrtet ut i det som senere ble omtalt som den mest unødvendig dramatiske gulrotkrisen i nyere Bru-historie.",
-  "Da alle kom inn igjen, var Bru-egget borte, glasslokket sto på gløtt, og flere vitneforklaringer passet mistenkelig dårlig sammen. Nå må dere lese logger, kodeord, tidslinjer og avhørsglipper langt skarpere enn før."
-];
+export const storyBranches = {
+  family: {
+    intro: [
+      "Påskeaften på hytta på Bru skulle bli årets store finale. Premiebordet sto klart, det legendariske Bru-egget lå under glasslokk, og alle gjestene ventet på den høytidelige avdukingen.",
+      "Så smalt sambandsradioen. Påskeharen skrek ute på tunet, en mus med kaninører raste gjennom snøen med en sekk småegg, og hele gjengen styrtet ut i det som senere ble omtalt som den mest unødvendig dramatiske gulrotkrisen i nyere Bru-historie.",
+      "Da alle kom inn igjen, var Bru-egget borte, glasslokket sto på gløtt, og flere vitneforklaringer passet mistenkelig dårlig sammen. Nå må dere lese logger, kodeord, tidslinjer og avhørsglipper langt skarpere enn før."
+    ],
+    briefingLead:
+      "Dette er den klassiske Bru-saken: familievennlig kaos, tydelige spor og akkurat nok lureri til at noen får være stolte av å ha brukt hjernen sin.",
+    briefingTip:
+      "Les stil, alibi og små rare glipper. På disse nivåene er sporene tydelige nok til at flinke påskedetektiver kan bygge trygg selvtillit."
+  },
+  adult: {
+    intro: [
+      "På de høyeste nivåene starter saken senere på kvelden. Etter den offisielle avdukingen fortsatte hytteturen med badstue, karaoke, bobler i plastglass og en kollektiv beslutning om at 'ingen trengte egentlig full oversikt'.",
+      "Så kom det andre kaoset: en hare i full panikk på tunet, en mus i kaninører, et altfor teatralsk nødskrik og flere voksne som plutselig hadde fryktelig dårlig kontroll på både tidslinje, morgenkåper og hvor de sist la nøklene sine.",
+      "Da roen senket seg, var Bru-egget borte igjen. Denne gangen skjuler løsningen seg ikke i ett bilde, men i korte tekster, skjeve formuleringer, krypterte spor og pinlige småglipper som nesten alle håper dere overser."
+    ],
+    briefingLead:
+      "Dette er nattversjonen av Bru-saken: samme hytte, samme egg og samme grunnkaos, men med mer voksenhytteskam, dårligere bortforklaringer og langt skarpere kodeoppgaver.",
+    briefingTip:
+      "På nivå 4 og 5 ligger svaret ofte gjemt i selve teksten. Se etter forbokstaver, mønstre, kodeord og setninger som virker litt for bevisst formulert."
+  }
+} as const;
+
+export const introText = storyBranches.family.intro;
 
 export const difficulties: Difficulty[] = [
   {
