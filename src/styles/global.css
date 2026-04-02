@@ -95,6 +95,22 @@
   .selected-difficulty {
     @apply border-orange-500 bg-[linear-gradient(135deg,rgba(255,244,185,0.92),rgba(255,221,110,0.75))] shadow-[0_16px_30px_rgba(183,104,26,0.18)];
   }
+
+  .puzzle-grid {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .clue-tile {
+    @apply rounded-[1.1rem] border border-stone-700/10 bg-white/88 p-4 shadow-[0_8px_18px_rgba(59,33,20,0.06)];
+  }
+
+  .code-display {
+    @apply rounded-[1rem] bg-stone-950 px-4 py-4 font-mono text-lg tracking-[0.2em] text-amber-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)];
+  }
+
+  .answer-input {
+    @apply w-full rounded-[1rem] border border-stone-700/10 bg-white px-4 py-3 text-base text-stone-900 shadow-[0_8px_18px_rgba(59,33,20,0.06)] outline-none focus:border-orange-400;
+  }
 }
 
 @media (max-width: 640px) {
