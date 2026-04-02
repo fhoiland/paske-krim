@@ -23,7 +23,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       content="Interaktiv og tilfeldig påskekrim ved hytta på Bru bygget med Astro og Tailwind CSS."
     />
   </head>
-  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.86),transparent_24%),linear-gradient(180deg,#7cb0ff_0%,#d7e7ff_18%,#f4f8ff_30%,#fff4ae_58%,#efc86f_100%)] text-stone-900">
+  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.86),transparent_24%),linear-gradient(180deg,#7cb0ff_0%,#d7e7ff_18%,#f4f8ff_30%,#fff4ae_58%,#efc86f_100%)] text-stone-900 overflow-x-hidden">
     <div class="pointer-events-none fixed inset-0 overflow-hidden">
       <div class="absolute left-[-6rem] top-24 h-72 w-72 rounded-full bg-pink-200/60 blur-3xl"></div>
       <div class="absolute right-[-5rem] bottom-20 h-80 w-80 rounded-full bg-yellow-100/70 blur-3xl"></div>
@@ -32,7 +32,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     </div>
     <script src={`${basePath}case-runtime.js`}></script>
     <slot />
-    <footer class="relative z-10 px-4 pb-6 text-center text-xs font-semibold tracking-[0.16em] text-stone-700/80 sm:px-6">
+    <footer class="relative z-10 px-4 pb-5 text-center text-[10px] leading-5 font-semibold tracking-[0.14em] text-stone-700/80 sm:px-6 sm:pb-6 sm:text-xs">
       {versionBadge}
     </footer>
   </body>
