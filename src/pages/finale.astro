@@ -3,7 +3,9 @@ import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
 import { finalChoices, progressKey, tasks } from "../data/bruStory";
 
-const base = import.meta.env.BASE_URL;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <MainLayout title="Finale | Påskekrimmen på Bru">
@@ -58,7 +60,7 @@ const base = import.meta.env.BASE_URL;
             og uskadd. Hytta på Bru er reddet, og påsken kan fortsette.
           </p>
           <a
-            href={base}
+            href={basePath}
             class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
           >
             Tilbake til forsiden
@@ -84,7 +86,7 @@ const base = import.meta.env.BASE_URL;
       </article>
     </section>
 
-    <script is:inline define:vars={{ progressKey, taskCount: tasks.length, base }}>
+    <script is:inline define:vars={{ progressKey, taskCount: tasks.length, basePath }}>
       const feedback = document.getElementById("final-feedback");
       const successBox = document.getElementById("final-success");
       const state = { culprit: "", witness: "", hiding: "" };
@@ -100,7 +102,7 @@ const base = import.meta.env.BASE_URL;
       const progress = readProgress();
       for (let i = 1; i <= taskCount; i += 1) {
         if (!progress.completed.includes(i)) {
-          window.location.href = `${base}oppgave/${i}`;
+          window.location.href = `${basePath}oppgave/${i}`;
           break;
         }
       }

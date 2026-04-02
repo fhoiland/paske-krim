@@ -6,13 +6,15 @@ interface Props {
 }
 
 const { title, eyebrow = "Påskekrim", kicker } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
   <header class="flex flex-wrap items-center justify-between gap-4">
     <a
-      href={base}
+      href={basePath}
       class="inline-flex items-center gap-2 rounded-full border border-stone-700/10 bg-white/70 px-4 py-2 text-sm font-semibold text-stone-700 shadow-sm backdrop-blur"
     >
       Til forsiden
@@ -29,7 +31,7 @@ const base = import.meta.env.BASE_URL;
 
     <aside class="overflow-hidden rounded-[2rem] border border-stone-700/10 bg-white/65 shadow-[0_18px_45px_rgba(59,33,20,0.12)]">
       <img
-        src={`${base}bru-paskekrim.png`}
+        src={`${basePath}bru-paskekrim.png`}
         alt="Påskekrim ved hytta på Bru med en mus som løper av gårde med påskeegg"
         class="h-full w-full object-cover"
       />

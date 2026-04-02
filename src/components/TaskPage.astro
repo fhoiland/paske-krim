@@ -9,7 +9,9 @@ interface Props {
 }
 
 const { task, totalTasks } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 const previousHref = task.id > 1 ? `/oppgave/${task.id - 1}` : "/";
 ---
 
@@ -50,7 +52,7 @@ const previousHref = task.id > 1 ? `/oppgave/${task.id - 1}` : "/";
       <div class="reveal-box mt-5 hidden" id={`success-task-${task.id}`}>
           <p>{task.successText}</p>
         <a
-          href={`${base}${task.nextHref.replace(/^\//, "")}`}
+          href={`${basePath}${task.nextHref.replace(/^\//, "")}`}
           class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
         >
           {task.nextLabel}
@@ -68,7 +70,7 @@ const previousHref = task.id > 1 ? `/oppgave/${task.id - 1}` : "/";
     define:vars={{
       taskId: task.id,
       correctAnswer: task.correctAnswer,
-      previousHref: `${base}${previousHref.replace(/^\//, "")}`,
+      previousHref: `${basePath}${previousHref.replace(/^\//, "")}`,
       progressKey
     }}
   >
