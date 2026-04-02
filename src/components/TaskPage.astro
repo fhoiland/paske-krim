@@ -32,11 +32,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
   </Fragment>
 
-  <section class="panel-card">
-    <span class="section-pill">Mistenkte på dette nivået</span>
-    <div id={`suspects-task-${task.id}`} class="mt-5 grid gap-4 lg:grid-cols-2"></div>
-  </section>
-
   <InvestigationMap basePath={basePath} currentTaskId={task.id} />
 
   <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
@@ -143,7 +138,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const agencyEl = document.getElementById(`agency-task-${taskId}`);
     const difficultyEl = document.getElementById(`difficulty-task-${taskId}`);
     const timerEl = document.getElementById(`timer-task-${taskId}`);
-    const suspectsEl = document.getElementById(`suspects-task-${taskId}`);
     const submitEl = document.getElementById(`check-task-${taskId}`);
     const mapShell = document.getElementById("advanced-map-shell");
     const mapCopy = document.getElementById("advanced-map-copy");
@@ -164,20 +158,6 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     setInterval(() => {
       timerEl.textContent = `Tid i saken: ${runtime.formatDuration(runtime.elapsedMs(caseFile))}`;
     }, 1000);
-
-    suspectsEl.innerHTML = suspects
-      .map(
-        (suspect) => `
-          <article class="dossier-card briefing-person-card">
-            <p class="font-serif text-2xl text-stone-900">${suspect.name}</p>
-            <p class="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-orange-800">${suspect.role}</p>
-            <p class="briefing-copy">${suspect.style}</p>
-            <p class="briefing-copy"><strong>Alibi:</strong> ${suspect.alibi}</p>
-            <p class="briefing-copy text-stone-600"><strong>Typisk glipp:</strong> ${suspect.interviewTell}</p>
-          </article>
-        `
-      )
-      .join("");
 
     function normalizeAnswer(value) {
       return (value || "")
