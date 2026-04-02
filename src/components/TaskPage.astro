@@ -150,13 +150,10 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     let selected = "";
     let correctAnswer = "";
     let answerMode = "options";
-
-    const motiveKeywordMap = {
-      sabotage: "SABOTASJE",
-      swap: "BYTTE",
-      spotlight: "SPOTLIGHT",
-      ransom: "AVTALE"
-    };
+    let attempts = 0;
+    let activeHelperText = "";
+    const delayedHelper = difficulty.level >= 4;
+    let helperUnlocked = !delayedHelper;
 
     caseNumberEl.textContent = `Bru-${caseFile.caseNumber}`;
     agencyEl.textContent = advancedCase ? advancedCase.title : agencyNames[(caseFile.caseNumber + taskId) % agencyNames.length];
@@ -445,15 +442,27 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           minimal: "Gi meg nøkkelminuttet, ikke magefølelsen."
         },
         5: {
-          max: `Kodeordet peker mot motivet "${motiveKeywordMap[motive.id]}".`,
-          high: "Brevet og glippene peker mot samme motivkode.",
-          medium: "Koble nøkkelord til plan og avhør.",
-          low: "Det lille sporet er viktigere enn de høylytte sporene.",
-          minimal: "Finn det trivielle sporet som endrer alt."
+          max: "Les notatene på nytt og se etter ett gjennomgående mønster i ordvalget.",
+          high: "Brevet, servietten og avhørsglippene peker i samme retning.",
+          medium: "Se etter hva som går igjen i små formuleringer.",
+          low: "Se etter det diskrete mønsteret, ikke det mest dramatiske.",
+          minimal: "Svaret ligger skjult i teksten, ikke i støyen."
         }
       };
 
       return helperMap[taskNumber]?.[difficulty.helperStrength] || "";
+    }
+
+    function setHelper(copy) {
+      activeHelperText = copy || "";
+      helperEl.textContent = helperUnlocked ? activeHelperText : "Hint låses opp etter første feilforsøk.";
+    }
+
+    function unlockDelayedHelper() {
+      if (helperUnlocked || !activeHelperText) return false;
+      helperUnlocked = true;
+      helperEl.textContent = activeHelperText;
+      return true;
     }
 
     if (advancedCase) {
@@ -470,7 +479,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
 
       addParagraphs(advancedParagraphs);
       promptEl.textContent = scene.prompt;
-      helperEl.textContent = scene.helper;
+      setHelper(scene.helper);
       renderEvidence(evidenceCards);
 
       if (taskId === 1) {
@@ -510,6 +519,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       successCopyEl.textContent = scene.success;
 
       if (progress.completed.includes(taskId)) {
+        unlockDelayedHelper();
         successEl.classList.remove("hidden");
         renderSuccessLinks(progress);
         feedbackEl.textContent = "Denne ruta er allerede løst.";
@@ -533,9 +543,13 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           renderSuccessLinks(progress);
           wireMap(progress);
         } else {
+          attempts += 1;
+          const unlockedNow = attempts === 1 ? unlockDelayedHelper() : false;
           feedbackEl.textContent =
-            difficulty.level === 5
-              ? "Det svaret kan føles riktig, men saken belønner ikke den raske teorien."
+            delayedHelper
+              ? unlockedNow
+                ? "Det svaret kan føles riktig, men saken belønner ikke den raske teorien. Hintet er nå åpnet."
+                : "Det svaret kan føles riktig, men saken belønner ikke den raske teorien."
               : "Ikke helt. Les sporene en gang til og vurder hva som er støy og hva som faktisk bærer vekt.";
           feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
         }
@@ -557,7 +571,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           "Bevisfoto",
           "Bildet viser kaoset på tunet. På de enklere nivåene holder det å forstå hva kaoset muliggjorde."
         );
-        helperEl.textContent = helperText(1);
+        setHelper(helperText(1));
 
         correctAnswer = "decoy";
         promptEl.textContent = "Hva er den beste forklaringen på hele opptrinnet?";
@@ -593,7 +607,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
             .join(". ")}. Ett navn passer betydelig dårligere enn de andre.`
         ]);
         promptEl.textContent = "Hvem peker spor og alibier tydeligst mot?";
-        helperEl.textContent = helperText(2);
+        setHelper(helperText(2));
         addOptions(
           optionPool(
             { value: culprit.id, label: culprit.name },
@@ -609,7 +623,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det risset inn en pil og en enkel skisse av ruten noen fulgte etter at alle stormet ut.`,
           `Rutehintet sier: ${hidingSpot.routeClue}. Den som løser koden riktig, vet også hvilket skjulested som passer.`
         ]);
-        helperEl.textContent = helperText(3);
+        setHelper(helperText(3));
         correctAnswer = hidingSpot.id;
         promptEl.textContent = "Hvor ble Bru-egget gjemt?";
         addOptions(
@@ -632,7 +646,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
         addMeta(
           `<p><strong>Regel:</strong> Den skyldige må ha hatt tid til å utnytte avledningen, være nær premiestativet og samtidig levere et alibi som ikke tåler klokkeslett.</p>`
         );
-        helperEl.textContent = helperText(4);
+        setHelper(helperText(4));
         promptEl.textContent = "Hvem avsløres av tidslinjen?";
         addOptions(
           optionPool(
@@ -647,12 +661,10 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       if (taskId === 5) {
         correctAnswer = motive.id;
         addParagraphs([
-          `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med ordet ${
-            motive.id === "sabotage" ? "INGEN" : motive.id === "swap" ? "KOPIEN" : motive.id === "spotlight" ? "LYSET" : "AVTALE"
-          }, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
-          "Når dere legger brevlappen og avhørsglippene ved siden av hverandre, peker alt mot ett motiv."
+          `På kjøkkenbordet finner dere tre notater: et halvbrent brev med linjen "${motive.clueText}", en serviett med et enkelt kodeord, og et kort avhørsreferat der ${culprit.name} ${culprit.interviewTell}.`,
+          "Ingen av notatene sier svaret direkte. Men ordvalg, tone og glipper danner et mønster som peker mot ett motiv."
         ]);
-        helperEl.textContent = helperText(5);
+        setHelper(helperText(5));
         promptEl.textContent = "Hva var tyvens egentlige motiv?";
         addOptions(
           optionPool(
@@ -665,6 +677,7 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       }
 
       if (progress.completed.includes(taskId)) {
+        unlockDelayedHelper();
         successEl.classList.remove("hidden");
         renderSuccessLinks(progress);
         feedbackEl.textContent = "Denne oppgaven er allerede løst.";
@@ -687,10 +700,16 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
           successEl.classList.remove("hidden");
           renderSuccessLinks(progress);
         } else {
+          attempts += 1;
+          const unlockedNow = attempts === 1 ? unlockDelayedHelper() : false;
           feedbackEl.textContent =
             difficulty.level <= 2
               ? "Nesten. Prøv igjen, superdetektiv."
-              : "Ikke helt. Les sporene nøye og prøv igjen.";
+              : delayedHelper
+                ? unlockedNow
+                  ? "Ikke helt. Les sporene nøye og prøv igjen. Hintet er nå åpnet."
+                  : "Ikke helt. Les sporene nøye og prøv igjen."
+                : "Ikke helt. Les sporene nøye og prøv igjen.";
           feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
         }
       });
