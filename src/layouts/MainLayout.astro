@@ -5,7 +5,7 @@ interface Props {
   title?: string;
 }
 
-const { title = "Påskemysteriet på Fjellro" } = Astro.props;
+const { title = "Påskekrimmen på hytta på Bru" } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,14 +16,14 @@ const { title = "Påskemysteriet på Fjellro" } = Astro.props;
     <title>{title}</title>
     <meta
       name="description"
-      content="Interaktiv påskekrim bygget med Astro og Tailwind CSS."
+      content="Interaktiv påskekrim ved hytta på Bru bygget med Astro og Tailwind CSS."
     />
   </head>
-  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.78),transparent_28%),radial-gradient(circle_at_14%_12%,rgba(255,255,255,0.35),transparent_18%),linear-gradient(180deg,#fff5be_0%,#ffe17d_26%,#f4d07b_52%,#d6af66_100%)] text-stone-900">
+  <body class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.82),transparent_28%),linear-gradient(180deg,#9dc1ff_0%,#d9e8ff_18%,#eef4ff_30%,#fff5bf_56%,#efcc72_100%)] text-stone-900">
     <div class="pointer-events-none fixed inset-0 overflow-hidden">
       <div class="absolute -left-20 top-24 h-64 w-64 rounded-full bg-pink-200/60 blur-3xl"></div>
       <div class="absolute -right-24 bottom-20 h-72 w-72 rounded-full bg-lime-100/70 blur-3xl"></div>
-      <div class="snow-layer absolute inset-0 opacity-45"></div>
+      <div class="snow-layer absolute inset-0 opacity-50"></div>
     </div>
     <slot />
   </body>

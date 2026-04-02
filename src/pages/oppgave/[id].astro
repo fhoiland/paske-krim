@@ -1,0 +1,18 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import TaskPage from "../../components/TaskPage.astro";
+import { tasks } from "../../data/bruStory";
+
+export function getStaticPaths() {
+  return tasks.map((task) => ({
+    params: { id: task.slug },
+    props: { task }
+  }));
+}
+
+const { task } = Astro.props;
+---
+
+<MainLayout title={`${task.title} | Påskekrimmen på Bru`}>
+  <TaskPage task={task} totalTasks={tasks.length} />
+</MainLayout>

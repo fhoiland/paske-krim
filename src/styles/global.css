@@ -6,64 +6,44 @@
 
 @layer components {
   .panel-card {
-    @apply relative overflow-hidden rounded-[2rem] border border-stone-700/10 bg-[linear-gradient(180deg,rgba(255,252,244,0.98),rgba(249,239,217,0.96))] p-6 shadow-[0_18px_45px_rgba(59,33,20,0.12)];
+    @apply relative overflow-hidden rounded-[2rem] border border-stone-700/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(249,244,229,0.94))] p-6 shadow-[0_18px_45px_rgba(59,33,20,0.14)] backdrop-blur;
   }
 
   .panel-card::after {
     content: "";
     position: absolute;
-    top: -1.75rem;
-    right: -1.75rem;
-    width: 7rem;
-    height: 7rem;
+    right: -2rem;
+    top: -2rem;
+    width: 8rem;
+    height: 8rem;
     border-radius: 9999px;
     background:
-      radial-gradient(circle at 30% 35%, rgba(255,255,255,0.72) 0 8%, transparent 9%),
-      radial-gradient(circle at 70% 42%, rgba(255,255,255,0.72) 0 8%, transparent 9%),
-      radial-gradient(circle at 52% 72%, rgba(255,255,255,0.72) 0 8%, transparent 9%),
-      linear-gradient(135deg, rgba(242, 199, 207, 0.55), rgba(216, 234, 210, 0.48));
-    opacity: 0.55;
-    transform: rotate(22deg);
+      radial-gradient(circle at 30% 35%, rgba(255,255,255,0.85) 0 9%, transparent 10%),
+      radial-gradient(circle at 70% 42%, rgba(255,255,255,0.85) 0 9%, transparent 10%),
+      radial-gradient(circle at 52% 72%, rgba(255,255,255,0.85) 0 9%, transparent 10%),
+      linear-gradient(135deg, rgba(255, 237, 130, 0.65), rgba(255, 194, 117, 0.4));
+    opacity: 0.7;
+    transform: rotate(18deg);
   }
 
   .section-pill {
-    @apply inline-flex rounded-full bg-orange-100/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-900;
+    @apply inline-flex rounded-full border border-orange-200 bg-orange-100/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-900;
   }
 
   .option-btn {
-    @apply w-full rounded-[1.1rem] border border-stone-700/10 bg-white/80 px-4 py-4 text-left text-stone-800 shadow-[0_8px_18px_rgba(59,33,20,0.06)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50;
+    @apply w-full rounded-[1.2rem] border border-stone-700/10 bg-white/85 px-4 py-4 text-left text-stone-800 shadow-[0_8px_18px_rgba(59,33,20,0.06)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50;
   }
 
   .selected-option {
-    @apply border-orange-500 bg-orange-100/70;
+    @apply border-orange-500 bg-[linear-gradient(135deg,rgba(255,240,166,0.9),rgba(255,221,110,0.7))];
   }
 
   .submit-btn {
-    @apply rounded-[1rem] bg-[linear-gradient(180deg,#d4663d,#934025)] px-4 py-3 font-semibold text-amber-50 shadow-[0_10px_20px_rgba(125,49,29,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(125,49,29,0.22)];
+    @apply rounded-[1rem] bg-[linear-gradient(180deg,#f08f35,#bf4d1d)] px-5 py-3 font-semibold text-amber-50 shadow-[0_10px_20px_rgba(125,49,29,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(125,49,29,0.22)];
   }
 
   .reveal-box {
-    @apply rounded-r-[1.2rem] border-l-4 border-yellow-400 bg-[rgba(255,248,237,0.98)] p-4 leading-7 text-stone-700;
-  }
-
-  .egg {
-    @apply inline-block h-[2.15rem] w-[1.65rem] rounded-[50%_50%_47%_47%/55%_55%_42%_42%] shadow-[inset_0_-5px_10px_rgba(0,0,0,0.06)];
-  }
-
-  .egg-pink {
-    background: linear-gradient(180deg, #ffe8ef 0 35%, #f2b8c6 35% 45%, #ffe8ef 45% 100%);
-  }
-
-  .egg-yellow {
-    background: linear-gradient(180deg, #fff6c8 0 34%, #f3ce51 34% 46%, #fff6c8 46% 100%);
-  }
-
-  .egg-green {
-    background: linear-gradient(180deg, #e6f5df 0 34%, #a3cf91 34% 46%, #e6f5df 46% 100%);
-  }
-
-  .egg-peach {
-    background: linear-gradient(180deg, #f9ead5 0 34%, #e2a56d 34% 46%, #f9ead5 46% 100%);
+    @apply rounded-[1.4rem] border border-yellow-300 bg-[linear-gradient(180deg,rgba(255,248,204,0.95),rgba(255,241,171,0.9))] p-5 leading-7 text-stone-800;
   }
 }
 
@@ -73,7 +53,7 @@
     radial-gradient(circle at 72% 24%, #fff 0 2px, transparent 3px),
     radial-gradient(circle at 28% 78%, #fff 0 2px, transparent 3px),
     radial-gradient(circle at 84% 68%, #fff 0 2px, transparent 3px),
-    radial-gradient(circle at 56% 48%, rgba(255, 255, 255, 0.7) 0 1px, transparent 3px);
+    radial-gradient(circle at 56% 48%, rgba(255, 255, 255, 0.8) 0 1px, transparent 3px);
   background-size: 240px 240px;
   animation: drift 22s linear infinite;
 }

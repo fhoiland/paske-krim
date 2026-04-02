@@ -1,0 +1,136 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import StoryShell from "../components/StoryShell.astro";
+import { finalChoices, progressKey, tasks } from "../data/bruStory";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<MainLayout title="Finale | Påskekrimmen på Bru">
+  <StoryShell title="Finalen ved hytta på Bru" eyebrow="Siste side" kicker="Avslør mysteriet">
+    <Fragment slot="lead">
+      <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
+        Nå vet dere hvor sporene leder. For å avslutte saken må dere velge riktig tyv, riktig vitne
+        og riktig gjemmested for Bru-egget.
+      </p>
+    </Fragment>
+
+    <section class="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <article class="panel-card">
+        <span class="section-pill">Velg løsningen</span>
+        <div class="mt-5 grid gap-6">
+          <section>
+            <p class="font-semibold text-stone-700">1. Hvem stjal Bru-egget?</p>
+            <div class="mt-3 grid gap-3" data-group="culprit">
+              {finalChoices.culprit.map((option) => (
+                <button class="option-btn" data-option={option.value} type="button">{option.label}</button>
+              ))}
+            </div>
+          </section>
+          <section>
+            <p class="font-semibold text-stone-700">2. Hvem ropte "NEEEIIIIII!!"?</p>
+            <div class="mt-3 grid gap-3" data-group="witness">
+              {finalChoices.witness.map((option) => (
+                <button class="option-btn" data-option={option.value} type="button">{option.label}</button>
+              ))}
+            </div>
+          </section>
+          <section>
+            <p class="font-semibold text-stone-700">3. Hvor lå egget gjemt?</p>
+            <div class="mt-3 grid gap-3" data-group="hiding">
+              {finalChoices.hiding.map((option) => (
+                <button class="option-btn" data-option={option.value} type="button">{option.label}</button>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <button class="submit-btn mt-6" id="solve-finale" type="button">Løs saken</button>
+        <p class="mt-4 min-h-6 font-semibold" id="final-feedback"></p>
+
+        <div class="reveal-box mt-5 hidden" id="final-success">
+          <p>
+            Perfekt. Den grå påskemusa med kaninører stjal Bru-egget, Påskeharen var den som ropte
+            i panikk, og egget ble gjemt under brua ved bekken.
+          </p>
+          <p class="mt-3">
+            Da dere løfter vekk plankebiten under brua, ligger det gullmalte Bru-egget der, iskaldt
+            og uskadd. Hytta på Bru er reddet, og påsken kan fortsette.
+          </p>
+          <a
+            href={base}
+            class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
+          >
+            Tilbake til forsiden
+          </a>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <span class="section-pill">Siste notat</span>
+        <div class="mt-5 space-y-4 leading-8 text-stone-700">
+          <p>
+            Dere vet allerede at musen flyktet med eggene, at lappen pekte mot brua, og at sporene
+            samlet seg ved bekken.
+          </p>
+          <p>
+            Det siste som gjenstår er å koble observasjonen fra bildet med sporene dere samlet underveis.
+          </p>
+          <p>
+            Når dere svarer riktig, lukker dere hele påskekrimmen side for side akkurat slik historien
+            utspilte seg ved hytta på Bru.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <script is:inline define:vars={{ progressKey, taskCount: tasks.length, base }}>
+      const feedback = document.getElementById("final-feedback");
+      const successBox = document.getElementById("final-success");
+      const state = { culprit: "", witness: "", hiding: "" };
+
+      function readProgress() {
+        try {
+          return JSON.parse(localStorage.getItem(progressKey) || '{"started":false,"completed":[]}');
+        } catch {
+          return { started: false, completed: [] };
+        }
+      }
+
+      const progress = readProgress();
+      for (let i = 1; i <= taskCount; i += 1) {
+        if (!progress.completed.includes(i)) {
+          window.location.href = `${base}oppgave/${i}`;
+          break;
+        }
+      }
+
+      document.querySelectorAll("[data-group]").forEach((group) => {
+        group.querySelectorAll("[data-option]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state[group.dataset.group] = button.dataset.option || "";
+            group.querySelectorAll("[data-option]").forEach((item) => item.classList.remove("selected-option"));
+            button.classList.add("selected-option");
+          });
+        });
+      });
+
+      document.getElementById("solve-finale")?.addEventListener("click", () => {
+        if (!state.culprit || !state.witness || !state.hiding) {
+          feedback.textContent = "Velg ett svar i alle tre feltene.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+          return;
+        }
+
+        if (state.culprit === "musa" && state.witness === "haren" && state.hiding === "under-brua") {
+          feedback.textContent = "Saken er løst.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
+          successBox?.classList.remove("hidden");
+        } else {
+          feedback.textContent = "Nesten. Gå gjennom sporene og bildet én gang til.";
+          feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+        }
+      });
+    </script>
+  </StoryShell>
+</MainLayout>

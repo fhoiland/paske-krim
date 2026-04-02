@@ -1,0 +1,140 @@
+---
+import type { Task } from "../data/bruStory";
+import { progressKey } from "../data/bruStory";
+import StoryShell from "./StoryShell.astro";
+
+interface Props {
+  task: Task;
+  totalTasks: number;
+}
+
+const { task, totalTasks } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const previousHref = task.id > 1 ? `/oppgave/${task.id - 1}` : "/";
+---
+
+<StoryShell
+  title={task.title}
+  eyebrow={`Oppgave ${task.id} av ${totalTasks}`}
+  kicker={task.scene}
+>
+  <Fragment slot="lead">
+    <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
+  </Fragment>
+
+  <section class="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+    <article class="panel-card">
+      <span class="section-pill">Situasjonen</span>
+      <div class="mt-5 space-y-4 leading-8 text-stone-700">
+        {task.story.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </article>
+
+    <article class="panel-card">
+      <span class="section-pill">Løs oppgaven</span>
+      <p class="mt-5 text-base leading-7 text-stone-700">{task.prompt}</p>
+
+      <div class="mt-5 grid gap-3" data-option-group={`task-${task.id}`}>
+        {task.options.map((option) => (
+          <button class="option-btn" data-option={option.value} type="button">
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      <button class="submit-btn mt-5" id={`check-task-${task.id}`} type="button">
+        Sjekk svaret
+      </button>
+      <p class="mt-4 min-h-6 font-semibold" id={`feedback-task-${task.id}`}></p>
+
+      <div class="reveal-box mt-5 hidden" id={`success-task-${task.id}`}>
+          <p>{task.successText}</p>
+        <a
+          href={`${base}${task.nextHref.replace(/^\//, "")}`}
+          class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
+        >
+          {task.nextLabel}
+        </a>
+      </div>
+
+      <p class="mt-5 text-sm leading-6 text-stone-500">
+        Hvis du står fast: {task.hintText}
+      </p>
+    </article>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{
+      taskId: task.id,
+      correctAnswer: task.correctAnswer,
+      previousHref: `${base}${previousHref.replace(/^\//, "")}`,
+      progressKey
+    }}
+  >
+    const group = document.querySelector(`[data-option-group="task-${taskId}"]`);
+    const feedback = document.getElementById(`feedback-task-${taskId}`);
+    const successBox = document.getElementById(`success-task-${taskId}`);
+    const submit = document.getElementById(`check-task-${taskId}`);
+    let selected = "";
+
+    function readProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(progressKey) || '{"started":false,"completed":[]}');
+      } catch {
+        return { started: false, completed: [] };
+      }
+    }
+
+    function writeProgress(progress) {
+      localStorage.setItem(progressKey, JSON.stringify(progress));
+    }
+
+    const progress = readProgress();
+    if (!progress.started) {
+      progress.started = true;
+      writeProgress(progress);
+    }
+
+    if (taskId > 1 && !progress.completed.includes(taskId - 1)) {
+      window.location.href = previousHref;
+    }
+
+    if (progress.completed.includes(taskId)) {
+      successBox?.classList.remove("hidden");
+      feedback.textContent = "Denne oppgaven er allerede løst.";
+      feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
+    }
+
+    group?.querySelectorAll("[data-option]").forEach((button) => {
+      button.addEventListener("click", () => {
+        selected = button.dataset.option || "";
+        group.querySelectorAll("[data-option]").forEach((item) => item.classList.remove("selected-option"));
+        button.classList.add("selected-option");
+      });
+    });
+
+    submit?.addEventListener("click", () => {
+      if (!selected) {
+        feedback.textContent = "Velg et svaralternativ først.";
+        feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+        return;
+      }
+
+      if (selected === correctAnswer) {
+        const nextProgress = readProgress();
+        nextProgress.started = true;
+        nextProgress.completed = Array.from(new Set([...(nextProgress.completed || []), taskId])).sort(
+          (a, b) => a - b
+        );
+        writeProgress(nextProgress);
+        feedback.textContent = "Riktig. Sporene peker dere videre.";
+        feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
+        successBox?.classList.remove("hidden");
+      } else {
+        feedback.textContent = "Ikke helt. Les situasjonen én gang til før dere prøver på nytt.";
+        feedback.className = "mt-4 min-h-6 font-semibold text-red-800";
+      }
+    });
+  </script>
+</StoryShell>

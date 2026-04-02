@@ -1,8 +1,100 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
-import MysteryApp from "../components/MysteryApp.astro";
+import StoryShell from "../components/StoryShell.astro";
+import { introText, progressKey, storyTitle } from "../data/bruStory";
+
+const base = import.meta.env.BASE_URL;
 ---
 
-<MainLayout>
-  <MysteryApp />
+<MainLayout title={storyTitle}>
+  <StoryShell title={storyTitle} eyebrow="Forside" kicker="Hytta på Bru">
+    <Fragment slot="lead">
+      <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
+        En mus i kaninører, et stjålet påskeegg og panikk utenfor hytta. Dette er starten på årets
+        påskekrim på Bru.
+      </p>
+    </Fragment>
+
+    <section class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+      <article class="panel-card">
+        <span class="section-pill">Historien begynner</span>
+        <div class="mt-5 space-y-4 leading-8 text-stone-700">
+          {introText.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          {["Hytta på Bru", "Påskeegg", "Snøspor", "Musetyv"].map((item) => (
+            <span class="rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-900">
+              {item}
+            </span>
+          ))}
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href={`${base}oppgave/1`}
+            id="start-story"
+            class="submit-btn inline-flex items-center justify-center"
+          >
+            Start mysteriet
+          </a>
+          <button
+            id="continue-story"
+            type="button"
+            class="hidden rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+          >
+            Fortsett der du slapp
+          </button>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <span class="section-pill">Hva venter dere?</span>
+        <div class="mt-5 space-y-4 leading-8 text-stone-700">
+          <p>
+            Først leser dere det dramatiske åstedet. Deretter klikker dere videre til oppgave 1.
+            Når en oppgave er løst, låses neste side opp.
+          </p>
+          <p>
+            Hver side gir dere én ny brikke i mysteriet: observasjon, kode, spor og til slutt den
+            store avsløringen av hva som skjedde ved hytta på Bru.
+          </p>
+          <div class="rounded-[1.5rem] bg-[linear-gradient(135deg,#fff0a6,#ffd867)] p-4 text-stone-900 shadow-inner">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-900">Ropet i snøen</p>
+            <p class="mt-2 font-serif text-4xl italic">NEEEIIIIII!!</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <script is:inline define:vars={{ progressKey, base }}>
+      const startButton = document.getElementById("start-story");
+      const continueButton = document.getElementById("continue-story");
+
+      function readProgress() {
+        try {
+          return JSON.parse(localStorage.getItem(progressKey) || '{"started":false,"completed":[]}');
+        } catch {
+          return { started: false, completed: [] };
+        }
+      }
+
+      startButton?.addEventListener("click", () => {
+        localStorage.setItem(progressKey, JSON.stringify({ started: true, completed: [] }));
+      });
+
+      const progress = readProgress();
+      if (progress.started) {
+        const nextStep = (progress.completed?.length || 0) + 1;
+        continueButton?.classList.remove("hidden");
+        continueButton?.addEventListener("click", () => {
+          if (nextStep > 3) {
+            window.location.href = `${base}finale`;
+          } else {
+            window.location.href = `${base}oppgave/${nextStep}`;
+          }
+        });
+      }
+    </script>
+  </StoryShell>
 </MainLayout>
