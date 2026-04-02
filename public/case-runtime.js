@@ -15,6 +15,15 @@
     return items[Math.floor(Math.random() * items.length)];
   }
 
+  function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   function normalizeBasePath(basePath) {
     if (!basePath) return "/";
     return basePath.endsWith("/") ? basePath : `${basePath}/`;
@@ -37,10 +46,12 @@
     const motive = randomFrom(data.motives);
     const hidingSpot = randomFrom(data.hidingSpots);
     const caseNumber = Math.floor(1000 + Math.random() * 9000);
+    const difficulty = data.difficulties?.find((item) => item.id === data.selectedDifficulty) || data.difficulties?.[2];
 
     return {
       version: data.caseVersion,
       caseNumber,
+      difficultyId: difficulty?.id || "sporhund",
       culpritId: culprit.id,
       motiveId: motive.id,
       hidingSpotId: hidingSpot.id,
@@ -67,6 +78,14 @@
     return nextCase;
   }
 
+  function resetAll(data) {
+    localStorage.removeItem(data.caseKey);
+    localStorage.removeItem(data.progressKey);
+    if (data.settingsKey) {
+      localStorage.removeItem(data.settingsKey);
+    }
+  }
+
   function readProgress(progressKey) {
     return readJson(progressKey, { started: false, completed: [] });
   }
@@ -87,14 +106,27 @@
     return items.find((item) => item.id === id);
   }
 
+  function readSettings(settingsKey, fallback) {
+    return readJson(settingsKey, fallback);
+  }
+
+  function writeSettings(settingsKey, value) {
+    writeJson(settingsKey, value);
+  }
+
   window.BruCaseRuntime = {
     createCase,
     ensureCase,
     resetCase,
+    resetAll,
     readProgress,
     writeProgress,
+    readSettings,
+    writeSettings,
     markCompleted,
     normalizeBasePath,
-    findById
+    findById,
+    shuffle,
+    shiftWord
   };
 })();

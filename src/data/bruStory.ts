@@ -33,15 +33,88 @@ export type TaskMeta = {
   nextLabel: string;
 };
 
+export type Difficulty = {
+  id: string;
+  level: number;
+  title: string;
+  shortLabel: string;
+  description: string;
+  humor: string;
+  optionCount: number;
+  helperStrength: "max" | "high" | "medium" | "low" | "minimal";
+};
+
 export const storyTitle = "Påskekrimmen på Bru";
 export const progressKey = "bru-hytte-paskekrim-progress";
 export const caseKey = "bru-hytte-paskekrim-case";
-export const caseVersion = 2;
+export const settingsKey = "bru-hytte-paskekrim-settings";
+export const caseVersion = 3;
+
+export const agencyNames = [
+  "Bruagentene",
+  "Kripos avdeling Bru",
+  "Bru Spesialenhet for Eggrelaterte Hendelser",
+  "Påskeberedskapen på Bru",
+  "Operasjon Gulrotblink"
+];
 
 export const introText = [
   "Påskeaften på hytta på Bru skulle bli årets høydepunkt. Premiebordet var pyntet, snøen glitret blått i kveldssola, og alle ventet på avsløringen av det legendariske Bru-egget.",
   "Så eksploderte hele tunet i kaos. Påskeharen skrek 'NEEEIIIIII!!', en liten mus med kaninører spratt gjennom snøen med sekken full av fargerike egg, og alle stormet ut for å se hva som foregikk.",
-  "Da folk kom inn igjen, var selve Bru-egget borte. Nå trenger hytta på Bru en skarp etterforsker. Hver oppgave gir dere én ny nøkkel til saken, og hver nye runde kan ha en helt annen tyv."
+  "Da folk kom inn igjen, var selve Bru-egget borte. Nå trenger hytta på Bru hjelp fra Bruagentene, Kripos avdeling Bru og alle som mener de er uvanlig gode til å følge snøspor og mistenkelig gulrotlogistikk."
+];
+
+export const difficulties: Difficulty[] = [
+  {
+    id: "trearing",
+    level: 1,
+    title: "Grad 1: Småsporeren",
+    shortLabel: "3 år",
+    description: "Ekstra tydelige spor, få alternativer og nesten komisk åpenbare svar.",
+    humor: "Anbefalt av Bru barnehage og harepatruljen for små snødetektiver.",
+    optionCount: 2,
+    helperStrength: "max"
+  },
+  {
+    id: "snosnute",
+    level: 2,
+    title: "Grad 2: Snøsnuta",
+    shortLabel: "Nybegynner",
+    description: "Litt mer lureri, men fortsatt trygt for ferske påskeetterforskere.",
+    humor: "For de som kan telle til tre og mistenke minst én nabo.",
+    optionCount: 3,
+    helperStrength: "high"
+  },
+  {
+    id: "sporhund",
+    level: 3,
+    title: "Grad 3: Sporhund",
+    shortLabel: "Vanlig",
+    description: "Balansen mellom moro, spor og faktisk tenking.",
+    humor: "Standardnivået til Bru Spesialenhet for Eggrelaterte Hendelser.",
+    optionCount: 4,
+    helperStrength: "medium"
+  },
+  {
+    id: "kripos",
+    level: 4,
+    title: "Grad 4: Kripos avdeling Bru",
+    shortLabel: "Vanskelig",
+    description: "Tettere spor, mer misledning og mindre håndholding.",
+    humor: "For dem som mumler 'jeg stoler ikke på noen' før kakao nummer to.",
+    optionCount: 5,
+    helperStrength: "low"
+  },
+  {
+    id: "kodeknekker",
+    level: 5,
+    title: "Grad 5: Avanserte kodeknekkere",
+    shortLabel: "Ekspert",
+    description: "Maks trøbbel. Flere bløffer, strammere hint og mer kodespråk i sporene.",
+    humor: "Bare for dem som blir fornærmet hvis saken er løst før appelsinen er skrelt.",
+    optionCount: 6,
+    helperStrength: "minimal"
+  }
 ];
 
 export const suspects: Suspect[] = [
@@ -49,37 +122,37 @@ export const suspects: Suspect[] = [
     id: "oskar",
     name: "Oskar Bruvik",
     role: "naboen i blå parkas",
-    style: "snakker rolig, men følger alltid med på alt som skjer rundt premiebordet",
+    style: "snakker rolig, men følger alltid med på alt som skjer rundt premiebordet og later som om han bare studerer været",
     clueItem: "blå skismøring",
     clueDetail: "et blankt blått merke langs kanten av premiepallen",
-    alibi: "hevdet at han bare sto ved vedstabelen og holdt øye med snøføyka"
+    alibi: "hevdet at han bare sto ved vedstabelen og drev avansert værforskning med hendene i lomma"
   },
   {
     id: "pelle",
     name: "Pelle Påskehare",
     role: "den teatralske arrangementsverten",
-    style: "lager store entréer, roper høyt og sprer alltid litt glitter etter seg",
+    style: "lager store entréer, roper høyt og mener alle problemer kan løses med mer konfetti",
     clueItem: "gult sceneglitter",
     clueDetail: "små gule glimt inne i smeltet snø ved den tomme eggsokkelen",
-    alibi: "påsto at han aldri gikk inn igjen etter at han begynte å rope på tunet"
+    alibi: "påsto at han var for opptatt med å rope så høyt at hele Bru skulle høre det"
   },
   {
     id: "lovise",
     name: "Lovise Lyng",
     role: "påskemaleren med fiolette fingre",
-    style: "ser uskyldig ut, men er ekstremt opptatt av detaljer, premier og hvem som vinner",
+    style: "ser uskyldig ut, men er ekstremt opptatt av detaljer, premier og hvem som får æren",
     clueItem: "fiolett eggmaling",
     clueDetail: "en tynn stripe fiolett maling bak silkeduken på premiebordet",
-    alibi: "insisterte på at hun sto ved kakaoen hele tiden og aldri nærmet seg pokalen"
+    alibi: "insisterte på at hun sto ved kakaoen hele tiden og bare bedømte marshmallow-kvalitet"
   },
   {
     id: "milla",
     name: "Milla Musetind",
     role: "oppfinneren bak påskemus-showet",
-    style: "smiler lurt, trener små dyr og har alltid med seg rekvisitter i lomma",
+    style: "smiler lurt, trener små dyr og har alltid en altfor kreativ plan ingen ba om",
     clueItem: "stripet gulrottråd",
     clueDetail: "en tynn gulrotfarget tråd hektet fast i kanten av premieduken",
-    alibi: "sa at hun bare jaget musen ute og ikke rakk å komme inn før alle andre"
+    alibi: "sa at hun bare jaget musen ute og slett ikke hadde tid til hovedforbrytelser"
   }
 ];
 

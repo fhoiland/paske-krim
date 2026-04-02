@@ -2,12 +2,15 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
 import {
+  agencyNames,
   caseKey,
   caseVersion,
+  difficulties,
   hidingSpots,
   introText,
   motives,
   progressKey,
+  settingsKey,
   storyTitle,
   suspects,
   totalTasks
@@ -22,8 +25,8 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
   <StoryShell title={storyTitle} eyebrow="Ny sak" kicker="Hytta på Bru">
     <Fragment slot="lead">
       <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
-        Nå er dette ikke bare en lineær påskekrim lenger. Hver gang du starter en ny sak, får du en
-        ny kombinasjon av tyv, motiv og gjemmested.
+        {agencyNames[0]}, {agencyNames[1]} og hele {agencyNames[2]} trenger hjelp. Velg vanskelighetsgrad,
+        start en ny sak, og trykk dere videre side for side gjennom avledning, spor, kode og finale.
       </p>
     </Fragment>
 
@@ -40,10 +43,32 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             <p class="mt-2 font-semibold text-stone-900">Forside + {totalTasks} oppgavesider + finale</p>
           </div>
           <div class="dossier-card">
-            <p class="dossier-label">Variasjon</p>
-            <p class="mt-2 font-semibold text-stone-900">Tilfeldig tyv, motiv og gjemmested</p>
+            <p class="dossier-label">Sakstjeneste</p>
+            <p class="mt-2 font-semibold text-stone-900">{agencyNames[3]} står klar med kakao og mistanke.</p>
           </div>
         </div>
+
+        <section class="mt-8">
+          <div class="flex items-center justify-between gap-3">
+            <span class="section-pill">Velg vanskelighetsgrad</span>
+            <p class="text-sm font-semibold text-orange-900" id="difficulty-current-label">Laster nivå...</p>
+          </div>
+
+          <div class="mt-4 grid gap-3">
+            {difficulties.map((difficulty) => (
+              <button type="button" class="difficulty-card text-left" data-difficulty={difficulty.id}>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-serif text-2xl text-stone-900">{difficulty.title}</p>
+                    <p class="mt-1 text-sm leading-6 text-stone-700">{difficulty.description}</p>
+                  </div>
+                  <span class="case-chip">{difficulty.shortLabel}</span>
+                </div>
+                <p class="mt-3 text-sm font-semibold text-orange-900">{difficulty.humor}</p>
+              </button>
+            ))}
+          </div>
+        </section>
 
         <div class="mt-8 flex flex-wrap gap-3">
           <button
@@ -51,7 +76,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
             type="button"
             class="submit-btn inline-flex items-center justify-center"
           >
-            Start ny tilfeldig sak
+            Start ny Bru-sak
           </button>
           <button
             id="continue-story"
@@ -76,18 +101,18 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           </div>
 
           <div class="dossier-card">
-            <p class="dossier-label">Hva kan variere?</p>
+            <p class="dossier-label">Hva varierer i hver runde?</p>
             <ul class="mt-3 space-y-2 text-sm leading-6 text-stone-700">
-              <li>{suspects.length} ulike tyver</li>
-              <li>{motives.length} ulike motiver</li>
-              <li>{hidingSpots.length} ulike skjulesteder</li>
+              <li>{suspects.length} mistenkte, og minst én oppfører seg dramatisk uten grunn.</li>
+              <li>{motives.length} motiver, fra sabotasje til ren oppmerksomhetsnød.</li>
+              <li>{hidingSpots.length} skjulesteder med svært tvilsom påskelogistikk.</li>
             </ul>
           </div>
 
           <div class="rounded-[1.6rem] bg-[linear-gradient(135deg,#fff0a6,#ffd867)] p-5 text-stone-900 shadow-inner">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-900">Kampmodus</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-orange-900">Bru-brief</p>
             <p class="mt-2 font-serif text-3xl leading-tight">
-              Nå gjør vi denne skarpere, mer kompleks og mer levende for hver runde.
+              {agencyNames[4]} melder at saken blir villere, morsommere og lurere jo høyere nivå du velger.
             </p>
           </div>
         </div>
@@ -100,9 +125,11 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         basePath,
         caseKey,
         caseVersion,
+        difficulties,
         hidingSpots,
         motives,
         progressKey,
+        settingsKey,
         suspects,
         totalTasks
       }}
@@ -110,7 +137,24 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const runtime = window.BruCaseRuntime;
       const startButton = document.getElementById("start-story");
       const continueButton = document.getElementById("continue-story");
-      const caseData = { caseKey, caseVersion, hidingSpots, motives, progressKey, suspects };
+      const difficultyLabel = document.getElementById("difficulty-current-label");
+      const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
+      const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
+      const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
+      let selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+
+      function caseDataFor(difficultyId) {
+        return {
+          caseKey,
+          caseVersion,
+          difficulties,
+          hidingSpots,
+          motives,
+          progressKey,
+          selectedDifficulty: difficultyId,
+          suspects
+        };
+      }
 
       function nextHref(progress) {
         const nextTask = (progress.completed?.length || 0) + 1;
@@ -118,8 +162,26 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
         return `${basePath}oppgave/${nextTask}`;
       }
 
+      function syncDifficultyUi() {
+        const active = difficulties.find((item) => item.id === selectedDifficulty) || defaultDifficulty;
+        difficultyLabel.textContent = `${active.title} valgt`;
+        difficultyButtons.forEach((button) => {
+          const isActive = button.dataset.difficulty === selectedDifficulty;
+          button.classList.toggle("selected-difficulty", isActive);
+        });
+      }
+
+      difficultyButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedDifficulty = button.dataset.difficulty || defaultDifficulty.id;
+          runtime.writeSettings(settingsKey, { difficultyId: selectedDifficulty });
+          syncDifficultyUi();
+        });
+      });
+
       startButton?.addEventListener("click", () => {
-        runtime.resetCase(caseData);
+        runtime.writeSettings(settingsKey, { difficultyId: selectedDifficulty });
+        runtime.resetCase(caseDataFor(selectedDifficulty));
         window.location.href = `${basePath}oppgave/1`;
       });
 
@@ -127,10 +189,17 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       if (progress.started) {
         continueButton?.classList.remove("hidden");
         continueButton?.addEventListener("click", () => {
-          runtime.ensureCase(caseData);
+          const caseFile = runtime.ensureCase(caseDataFor(selectedDifficulty));
+          if (caseFile?.difficultyId && caseFile.difficultyId !== selectedDifficulty) {
+            runtime.writeSettings(settingsKey, { difficultyId: caseFile.difficultyId });
+            selectedDifficulty = caseFile.difficultyId;
+            syncDifficultyUi();
+          }
           window.location.href = nextHref(progress);
         });
       }
+
+      syncDifficultyUi();
     </script>
   </StoryShell>
 </MainLayout>

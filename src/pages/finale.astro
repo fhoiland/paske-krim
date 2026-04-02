@@ -1,7 +1,18 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import StoryShell from "../components/StoryShell.astro";
-import { caseKey, caseVersion, hidingSpots, motives, progressKey, suspects, totalTasks } from "../data/bruStory";
+import {
+  agencyNames,
+  caseKey,
+  caseVersion,
+  difficulties,
+  hidingSpots,
+  motives,
+  progressKey,
+  settingsKey,
+  suspects,
+  totalTasks
+} from "../data/bruStory";
 
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
@@ -13,7 +24,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <Fragment slot="lead">
       <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">
         Nå må dere samle alt: avledningen, sportsbeviset, kodelappen og brevet i peisen. Når alle tre
-        sluttvalg er riktige, får dere hele avsløringen.
+        sluttvalg er riktige, får dere hele avsløringen og kan sende rapporten tilbake til Bruagentene.
       </p>
     </Fragment>
 
@@ -54,30 +65,40 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 
         <div class="reveal-box mt-5 hidden" id="final-success">
           <p id="final-reveal-copy"></p>
-          <button
-            type="button"
-            id="restart-case"
-            class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
-          >
-            Start en helt ny tilfeldig sak
-          </button>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              id="restart-case"
+              class="inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
+            >
+              Start helt ny sak
+            </button>
+            <button
+              type="button"
+              id="restart-same-difficulty"
+              class="inline-flex rounded-full border border-stone-700/10 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+            >
+              Ny sak på samme nivå
+            </button>
+          </div>
         </div>
       </article>
 
       <article class="panel-card">
         <span class="section-pill">Sammendrag</span>
         <div class="mt-5 space-y-4 leading-8 text-stone-700">
+          <p id="final-agency-copy"></p>
           <p>
-            Denne versjonen av påskekrimmen trekker en ny kombinasjon for hver ny runde. Derfor må
-            dere faktisk lese sporene, ikke bare huske gamle svar.
-          </p>
-          <p>
-            Bru-egget kan være gjemt på flere steder, motivet kan være helt annerledes neste gang,
-            og den som ser mest uskyldig ut i én runde kan være hjernen bak alt i den neste.
+            Når dere starter på nytt, nullstilles saken skikkelig. Ingen gamle spor, ingen hengende lokal
+            state og ingen gjenbruk av forrige finale som later som den fortsatt er aktuell.
           </p>
           <div class="dossier-card">
             <p class="dossier-label">Fullført løype</p>
-            <p class="mt-2 font-semibold text-stone-900">Avledning, sporrom, kodelapp og motivbrev</p>
+            <p class="mt-2 font-semibold text-stone-900">Avledning, sporrom, kodelapp, motivbrev og sluttrapport</p>
+          </div>
+          <div class="dossier-card">
+            <p class="dossier-label">Aktiv vanskelighetsgrad</p>
+            <p id="final-difficulty-copy" class="mt-2 font-semibold text-stone-900">Laster nivå ...</p>
           </div>
         </div>
       </article>
@@ -86,18 +107,34 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <script
       is:inline
       define:vars={{
+        agencyNames,
         basePath,
         caseKey,
         caseVersion,
+        difficulties,
         hidingSpots,
         motives,
         progressKey,
+        settingsKey,
         suspects,
         totalTasks
       }}
     >
       const runtime = window.BruCaseRuntime;
-      const caseData = { caseKey, caseVersion, hidingSpots, motives, progressKey, suspects };
+      const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
+      const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
+      const selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+      const caseData = {
+        caseKey,
+        caseVersion,
+        difficulties,
+        hidingSpots,
+        motives,
+        progressKey,
+        selectedDifficulty,
+        settingsKey,
+        suspects
+      };
       const caseFile = runtime.ensureCase(caseData);
       const progress = runtime.readProgress(progressKey);
 
@@ -108,10 +145,17 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       const culprit = runtime.findById(suspects, caseFile.culpritId);
       const motive = runtime.findById(motives, caseFile.motiveId);
       const hidingSpot = runtime.findById(hidingSpots, caseFile.hidingSpotId);
+      const difficulty = difficulties.find((item) => item.id === caseFile.difficultyId) || defaultDifficulty;
       const feedback = document.getElementById("final-feedback");
       const revealBox = document.getElementById("final-success");
       const revealCopy = document.getElementById("final-reveal-copy");
+      const agencyCopy = document.getElementById("final-agency-copy");
+      const difficultyCopy = document.getElementById("final-difficulty-copy");
       const state = { culprit: "", motive: "", hiding: "" };
+
+      agencyCopy.textContent =
+        `${agencyNames[(caseFile.caseNumber + 1) % agencyNames.length]} er klare til å arkivere saken, men bare hvis rapporten deres ikke lukter ren gjetting.`;
+      difficultyCopy.textContent = `${difficulty.title} | ${difficulty.humor}`;
 
       document.querySelectorAll("[data-group]").forEach((group) => {
         group.querySelectorAll("[data-option]").forEach((button) => {
@@ -134,7 +178,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
           feedback.textContent = "Saken er løst.";
           feedback.className = "mt-4 min-h-6 font-semibold text-green-800";
           revealCopy.textContent =
-            `${culprit.name} viste seg å stå bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble til slutt funnet ${hidingSpot.label}.`;
+            `${culprit.name} sto bak tyveriet. Motivet var ${motive.label}, og Bru-egget ble funnet ${hidingSpot.label}. ${agencyNames[0]} kaller dette en forbilledlig seier for norsk hytteetterforskning.`;
           revealBox.classList.remove("hidden");
         } else {
           feedback.textContent = "Nesten. Les gjennom sporene igjen og prøv en ny kombinasjon.";
@@ -143,6 +187,12 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
       });
 
       document.getElementById("restart-case")?.addEventListener("click", () => {
+        runtime.resetAll({ caseKey, progressKey, settingsKey });
+        window.location.href = basePath;
+      });
+
+      document.getElementById("restart-same-difficulty")?.addEventListener("click", () => {
+        runtime.writeSettings(settingsKey, { difficultyId: difficulty.id });
         runtime.resetCase(caseData);
         window.location.href = `${basePath}oppgave/1`;
       });

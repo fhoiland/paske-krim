@@ -86,6 +86,14 @@
   .reveal-box {
     @apply rounded-[1.4rem] border border-yellow-300 bg-[linear-gradient(180deg,rgba(255,248,204,0.95),rgba(255,241,171,0.9))] p-5 leading-7 text-stone-800;
   }
+
+  .difficulty-card {
+    @apply w-full rounded-[1.5rem] border border-stone-700/10 bg-white/80 px-5 py-5 shadow-[0_10px_25px_rgba(59,33,20,0.08)] transition hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-orange-50/80;
+  }
+
+  .selected-difficulty {
+    @apply border-orange-500 bg-[linear-gradient(135deg,rgba(255,244,185,0.92),rgba(255,221,110,0.75))] shadow-[0_16px_30px_rgba(183,104,26,0.18)];
+  }
 }
 
 .snow-layer {

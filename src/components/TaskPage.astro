@@ -1,6 +1,18 @@
 ---
 import StoryShell from "./StoryShell.astro";
-import { hidingSpots, motives, suspects, type TaskMeta, totalTasks } from "../data/bruStory";
+import {
+  agencyNames,
+  caseKey,
+  caseVersion,
+  difficulties,
+  hidingSpots,
+  motives,
+  progressKey,
+  settingsKey,
+  suspects,
+  type TaskMeta,
+  totalTasks
+} from "../data/bruStory";
 
 interface Props {
   task: TaskMeta;
@@ -13,11 +25,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePath;
 ---
 
-<StoryShell
-  title={task.title}
-  eyebrow={`Oppgave ${task.id} av ${totalTasks}`}
-  kicker={task.scene}
->
+<StoryShell title={task.title} eyebrow={`Oppgave ${task.id} av ${totalTasks}`} kicker={task.scene}>
   <Fragment slot="lead">
     <p class="mt-4 max-w-3xl text-lg leading-8 text-stone-700">{task.question}</p>
   </Fragment>
@@ -27,15 +35,23 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       <span class="section-pill">Etterforskningslogg</span>
       <div id={`story-task-${task.id}`} class="mt-5 space-y-4 leading-8 text-stone-700"></div>
 
-      <div class="mt-6 rounded-[1.6rem] border border-dashed border-orange-300 bg-orange-50/70 p-4">
-        <p class="dossier-label">Saksnummer</p>
-        <p id={`case-number-${task.id}`} class="mt-2 font-serif text-3xl text-stone-900">Laster sak ...</p>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        <div class="rounded-[1.6rem] border border-dashed border-orange-300 bg-orange-50/70 p-4">
+          <p class="dossier-label">Saksnummer</p>
+          <p id={`case-number-${task.id}`} class="mt-2 font-serif text-3xl text-stone-900">Laster sak ...</p>
+        </div>
+        <div class="rounded-[1.6rem] border border-dashed border-orange-300 bg-orange-50/70 p-4">
+          <p class="dossier-label">Aktiv enhet</p>
+          <p id={`agency-task-${task.id}`} class="mt-2 font-serif text-2xl text-stone-900">Laster enhet ...</p>
+          <p id={`difficulty-task-${task.id}`} class="mt-2 text-sm font-semibold text-orange-900"></p>
+        </div>
       </div>
     </article>
 
     <article class="panel-card">
       <span class="section-pill">Velg riktig spor</span>
       <p id={`prompt-task-${task.id}`} class="mt-5 text-base leading-7 text-stone-700"></p>
+      <p id={`helper-task-${task.id}`} class="mt-3 text-sm font-semibold text-orange-900"></p>
 
       <div id={`options-task-${task.id}`} class="mt-5 grid gap-3"></div>
 
@@ -75,20 +91,33 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
   <script
     is:inline
     define:vars={{
-      basePath,
-      previousHref,
-      progressKey: "bru-hytte-paskekrim-progress",
-      caseKey: "bru-hytte-paskekrim-case",
-      caseVersion: 2,
+      agencyNames,
+      caseKey,
+      caseVersion,
+      difficulties,
       hidingSpots,
       motives,
+      previousHref,
+      progressKey,
+      settingsKey,
       suspects,
-      taskId: task.id,
-      totalTasks
+      taskId: task.id
     }}
   >
     const runtime = window.BruCaseRuntime;
-    const caseData = { caseKey, caseVersion, hidingSpots, motives, progressKey, suspects };
+    const defaultDifficulty = difficulties.find((item) => item.level === 3) || difficulties[0];
+    const settings = runtime.readSettings(settingsKey, { difficultyId: defaultDifficulty.id });
+    const selectedDifficulty = settings.difficultyId || defaultDifficulty.id;
+    const caseData = {
+      caseKey,
+      caseVersion,
+      difficulties,
+      hidingSpots,
+      motives,
+      progressKey,
+      selectedDifficulty,
+      suspects
+    };
     const caseFile = runtime.ensureCase(caseData);
     const progress = runtime.readProgress(progressKey);
 
@@ -103,21 +132,39 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
     const culprit = runtime.findById(suspects, caseFile.culpritId);
     const motive = runtime.findById(motives, caseFile.motiveId);
     const hidingSpot = runtime.findById(hidingSpots, caseFile.hidingSpotId);
+    const difficulty = difficulties.find((item) => item.id === caseFile.difficultyId) || defaultDifficulty;
     const storyEl = document.getElementById(`story-task-${taskId}`);
     const promptEl = document.getElementById(`prompt-task-${taskId}`);
+    const helperEl = document.getElementById(`helper-task-${taskId}`);
     const optionsEl = document.getElementById(`options-task-${taskId}`);
     const feedbackEl = document.getElementById(`feedback-task-${taskId}`);
     const successEl = document.getElementById(`success-task-${taskId}`);
     const successCopyEl = document.getElementById(`success-copy-${taskId}`);
     const caseNumberEl = document.getElementById(`case-number-${taskId}`);
+    const agencyEl = document.getElementById(`agency-task-${taskId}`);
+    const difficultyEl = document.getElementById(`difficulty-task-${taskId}`);
     const submitEl = document.getElementById(`check-task-${taskId}`);
     let selected = "";
     let correctAnswer = "";
 
     caseNumberEl.textContent = `Bru-${caseFile.caseNumber}`;
+    agencyEl.textContent = agencyNames[(caseFile.caseNumber + taskId) % agencyNames.length];
+    difficultyEl.textContent = `${difficulty.title} | ${difficulty.humor}`;
 
     function addParagraphs(paragraphs) {
       storyEl.innerHTML = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
+    }
+
+    function optionPool(correctOption, extras, decoys) {
+      const wrongExtras = runtime.shuffle(extras.filter((item) => item.value !== correctOption.value));
+      const neededWrong = Math.max(1, difficulty.optionCount - 1);
+      const picked = wrongExtras.slice(0, neededWrong);
+
+      if (picked.length < neededWrong) {
+        picked.push(...runtime.shuffle(decoys).slice(0, neededWrong - picked.length));
+      }
+
+      return runtime.shuffle([correctOption, ...picked.slice(0, neededWrong)]);
     }
 
     function addOptions(options) {
@@ -137,64 +184,149 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
       });
     }
 
+    function helperText(taskNumber) {
+      const helperMap = {
+        1: {
+          max: "Bruagentene hvisker: Se etter hva som skjedde inne, ikke bare ute i snøen.",
+          high: "Tips fra Kripos avdeling Bru: Avledningen er ofte høylytt, tyveriet ofte stille.",
+          medium: "Tenk på hva kaoset utenfor ga tyven tid til.",
+          low: "Lite tips: Bråk hjelper ofte noen andre.",
+          minimal: "Ingen kakao-hint på ekspertnivå."
+        },
+        2: {
+          max: `Snill hjelp: Finn personen som matcher sporet "${culprit.clueItem}".`,
+          high: "Se på både spor ved sokkelen og hvem som hadde et skjelvende alibi.",
+          medium: "Ett spor og ett alibi peker samme vei.",
+          low: "Sammenlikn detaljsporet med rollene.",
+          minimal: "Sporet lyver mindre enn folk gjør."
+        },
+        3: {
+          max: `Koden ${caseFile.codedWord} er bare et forskjøvet ord for skjulestedet.`,
+          high: "Kodeordet er vridd, men ikke veldig langt fra sannheten.",
+          medium: "Bruk både rutehint og kodehint.",
+          low: "Rute og kode bør møtes i samme sted.",
+          minimal: "Dekod eller gjett klokt."
+        },
+        4: {
+          max: `Brevet sier nesten rett ut: "${motive.clueText}"`,
+          high: "Les setningen i brevet som om tyven allerede skryter.",
+          medium: "Motivet må passe både brevet og hele planen.",
+          low: "Brevet er mer ærlig enn tyven.",
+          minimal: "Linjen i brevet er nok."
+        }
+      };
+
+      return helperMap[taskNumber]?.[difficulty.helperStrength] || "";
+    }
+
+    const genericDecoys = {
+      task1: [
+        { value: "snowman", label: "Snømannen utenfor var egentlig hjernen bak alt og krevde diplom." },
+        { value: "cocoa", label: "Kakaoen var så god at alle frivillig ga bort egget." },
+        { value: "weather", label: "Dette var bare et meteorologisk påskeuhell, ikke et tyveri." }
+      ],
+      suspects: [
+        { value: "grandma", label: "Bestemor Berit, som bare kom for vafler og å dømme alle." },
+        { value: "snowcat", label: "En mystisk snøkatt fra Bru som ingen faktisk har sett." },
+        { value: "janitor", label: "Vaktmester Roger, kjent for å mistenke alle gardiner." }
+      ],
+      hiding: [
+        { value: "attic-sock", label: "I en enslig ullsokk bak støvsugeren." },
+        { value: "sauna", label: "I den hemmelige badstua som ingen husker å ha bygget." },
+        { value: "moon", label: "På månen, fordi ekspertnivå liker store sprang." }
+      ],
+      motives: [
+        { value: "diet", label: "Tyven ville starte lavkarbo påske for hele hytta." },
+        { value: "podcast", label: "Tyven trengte innhold til podcasten 'Egg og bedrag'." },
+        { value: "drama", label: "Alt ble gjort for å vinne den uoffisielle prisen 'mest dramatisk påskegjest'." }
+      ]
+    };
+
     if (taskId === 1) {
       correctAnswer = "decoy";
       addParagraphs([
-        "Det som ser ut som hovedtyveriet ute på tunet, er bare første lag. Musen løper med små pyntede jakt-egg, mens alle voksne stormer ut i snøen.",
-        "Inne i stua ligger silkeduken på premiebordet fortsatt varm, med et tomt ovalt merke der Bru-egget nettopp sto. Smeltet snø drypper på gulvet innenfor døra. Noen brukte kaoset ute som en perfekt avledning."
+        "Tunet er et fullstendig påskesirkus. Musen spretter gjennom snøen med pyntede småegg, haren roper som om verdens gulrotlager står i brann, og alle voksne spurter ut uten plan.",
+        "Inne i stua ligger den tomme sokkelen fortsatt varm. Smeltet snø drypper innenfor døra, og silkeduken har et ovalt merke der Bru-egget nettopp sto. Det er klassisk Bru-kaos: høylytt avledning ute, stille forbrytelse inne."
       ]);
-      promptEl.textContent = "Hva er den beste konklusjonen etter å ha sett både bildet og premiebordet inne?";
-      addOptions([
-        {
-          value: "decoy",
-          label: "Flukten ute var en avledning mens det ekte Bru-egget ble stjålet inne i hytta"
-        },
-        {
-          value: "outside",
-          label: "Musen løp direkte av gårde med selve Bru-egget, og alt skjedde ute på tunet"
-        },
-        {
-          value: "hare",
-          label: "Påskeharen ropte fordi han selv mistet kontroll på premien ved et uhell"
-        }
-      ]);
+      promptEl.textContent = "Hva er den beste forklaringen på hele opptrinnet?";
+      helperEl.textContent = helperText(1);
+      addOptions(
+        optionPool(
+          {
+            value: "decoy",
+            label: "Flukten ute var en avledning mens det ekte Bru-egget ble stjålet inne i hytta"
+          },
+          [
+            {
+              value: "outside",
+              label: "Musen løp direkte av gårde med selve Bru-egget, og alt skjedde ute på tunet"
+            },
+            {
+              value: "hare",
+              label: "Påskeharen ropte fordi han selv mistet kontroll på premien ved et uhell"
+            }
+          ],
+          genericDecoys.task1
+        )
+      );
       successCopyEl.textContent =
-        "Nettopp. Nå vet dere at bildet viser avledningen, ikke hele forbrytelsen. Dere må derfor lete etter den som rakk å snike seg inn til premiebordet.";
+        "Riktig. Bruagentene noterer at dere ikke lot dere lure av tun-teateret. Nå vet dere at noen brukte kaoset som dekke for den ekte forbrytelsen.";
     }
 
     if (taskId === 2) {
       correctAnswer = culprit.id;
       addParagraphs([
-        `Tilbake ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er ikke nok til å felle noen alene, men det matcher det ene sporet alle på hytta kjenner igjen.`,
+        `Ved den tomme sokkelen finner dere ${culprit.clueDetail}. Det er et lite spor, men på Bru finnes det få ting som er mer avslørende enn feil person med riktig glitter, maling eller gulrottråd.`,
         `Samtidig går dere gjennom alibiene: ${suspects
           .map((suspect) => `${suspect.name} ${suspect.alibi}`)
-          .join(". ")}. Ett navn passer urovekkende godt med sporet ved sokkelen.`
+          .join(". ")}. ${agencyNames[1]} mener at minst ett alibi ble skrevet i full fart mellom to slurker kakao.`
       ]);
-      promptEl.textContent = "Hvem peker sportsbeviset og alibikaoset tydeligst mot?";
-      addOptions(suspects.map((suspect) => ({ value: suspect.id, label: suspect.name })));
-      successCopyEl.textContent = `Sporene peker mot ${culprit.name}. Det betyr ikke at hele saken er ferdig, men dere vet nå hvem som utnyttet avledningen best.`;
+      promptEl.textContent = "Hvem peker spor og alibier tydeligst mot?";
+      helperEl.textContent = helperText(2);
+      addOptions(
+        optionPool(
+          { value: culprit.id, label: culprit.name },
+          suspects.map((suspect) => ({ value: suspect.id, label: suspect.name })),
+          genericDecoys.suspects
+        )
+      );
+      successCopyEl.textContent = `Sporene peker mot ${culprit.name}. Nå begynner rapporten å ligne noe ${agencyNames[2]} faktisk ville ha satt stempel på.`;
     }
 
     if (taskId === 3) {
       correctAnswer = hidingSpot.id;
       addParagraphs([
-        `Mellom verandaen og bekken finner dere en ny lapp. Der står det bare: ${caseFile.codedWord}. Ved siden av koden er det risset inn en pil og et lite merke som peker bort fra tunet.`,
-        `Det andre sporet er mer fysisk: ${hidingSpot.routeClue}. Sammen peker koden og ruten mot ett bestemt skjulested.`
+        `Mellom verandaen og bekken finner dere en lapp med koden ${caseFile.codedWord}. På baksiden er det tegnet en pil, to sure påskeegg og et ansikt som ser fornøyd ulovlig ut.`,
+        `Det andre sporet er mer konkret: ${hidingSpot.routeClue}. Når dere kobler den forskjøvne koden med ruten, peker alt mot ett sted.`
       ]);
-      promptEl.textContent = "Hvor ble Bru-egget mest sannsynlig gjemt?";
-      addOptions(hidingSpots.map((spot) => ({ value: spot.id, label: spot.label })));
-      successCopyEl.textContent = hidingSpot.revealText;
+      promptEl.textContent = "Hvor ble Bru-egget gjemt?";
+      helperEl.textContent = helperText(3);
+      addOptions(
+        optionPool(
+          { value: hidingSpot.id, label: hidingSpot.label },
+          hidingSpots.map((spot) => ({ value: spot.id, label: spot.label })),
+          genericDecoys.hiding
+        )
+      );
+      successCopyEl.textContent = `${hidingSpot.revealText} Selv ${agencyNames[0]} nikker fornøyd og later som dette var planen hele tiden.`;
     }
 
     if (taskId === 4) {
       correctAnswer = motive.id;
       addParagraphs([
         `I peisen ligger et halvbrent brev med én lesbar linje: "${motive.clueText}"`,
-        `Brevet er brettet inn i et programark fra kveldens finale. Det virker skrevet av noen som ikke bare ville ha egget, men også oppnå noe mer med hele stuntet.`
+        "Brevet er brettet rundt et programark fra kveldens finale. Det lukter røyk, kakao og selvopptatt besluttsomhet. Her skjønner dere at tyven ikke bare ville eie egget, men oppnå noe større, rarere eller mer irriterende."
       ]);
-      promptEl.textContent = "Hvilket motiv passer best med brevet og opplegget rundt tyveriet?";
-      addOptions(motives.map((item) => ({ value: item.id, label: item.label })));
-      successCopyEl.textContent = motive.revealText;
+      promptEl.textContent = "Hva var tyvens egentlige motiv?";
+      helperEl.textContent = helperText(4);
+      addOptions(
+        optionPool(
+          { value: motive.id, label: motive.label },
+          motives.map((item) => ({ value: item.id, label: item.label })),
+          genericDecoys.motives
+        )
+      );
+      successCopyEl.textContent = `${motive.revealText} Nå gjenstår bare sluttrapporten til ${agencyNames[3]}.`;
     }
 
     if (progress.completed.includes(taskId)) {
@@ -216,7 +348,12 @@ const previousHref = task.id > 1 ? `${basePath}oppgave/${task.id - 1}` : basePat
         feedbackEl.className = "mt-4 min-h-6 font-semibold text-green-800";
         successEl.classList.remove("hidden");
       } else {
-        feedbackEl.textContent = "Ikke helt. Les sporene nøye og prøv igjen.";
+        feedbackEl.textContent =
+          difficulty.level <= 2
+            ? "Nesten. Prøv igjen, superdetektiv."
+            : difficulty.level === 5
+              ? "Feil spor. Bru Spesialenhet løfter et skeptisk øyenbryn."
+              : "Ikke helt. Les sporene nøye og prøv igjen.";
         feedbackEl.className = "mt-4 min-h-6 font-semibold text-red-800";
       }
     });
