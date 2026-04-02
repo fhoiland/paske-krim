@@ -1,11 +1,19 @@
 # Påske-krim
 
-En liten interaktiv paskekrim-app laget i ren HTML, CSS og JavaScript.
+En interaktiv påskekrim-app laget i ren HTML, CSS og JavaScript.
 
-## Kjor lokalt
+## Kjør lokalt
 
-Apne `index.html` i en nettleser.
+Åpne `index.html` i en nettleser.
 
-## Del appen
+## Innhold
 
-Prosjektet er laget som en enkel statisk side, sa det kan deles via GitHub Pages eller ved a sende lenken til repoet.
+Appen inneholder:
+
+- flere spor som låses opp etter hvert
+- svaralternativer i stedet for bare fritekst
+- en avsluttende løsning der spillerne må finne skyldig, motiv og gjemmested
+
+## Deling
+
+Prosjektet er laget som en statisk side, så det kan deles via GitHub eller publiseres med GitHub Pages.
